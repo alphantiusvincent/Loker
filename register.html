@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daftar Akun - BawaMap</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="Image/logo-BM.png" type="image/x-icon">
+</head>
+<body>
+
+  <header class="navigasi">
+    <div class="container">
+      <div class="merek-navigasi">
+        <div class="kepala-kartu">
+          <div class="logo-perusahaan1">
+            <img src="Image/logo-BM.png" alt="logo-BM">
+          </div>
+          <a href="index.html">
+            <h1>BawaMap</h1>
+          </a>
+        </div>
+      </div>
+      <nav class="menu-navigasi">
+        <ul>
+          <li><a href="index.html">Beranda</a></li>
+          <li><a href="#">Kategori</a></li>
+          <li><a href="#">Perusahaan</a></li>
+          <li><a href="#">Tentang Kami</a></li>
+        </ul>
+      </nav>
+      <div class="otentikasi-navigasi">
+        <a href="login.html"><button class="tombol-masuk">Masuk</button></a>
+        <a href="register.html"><button class="tombol-daftar">Daftar</button></a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="container-formulir-aplikasi">
+        <div class="header-formulir-aplikasi">
+          <h2>Daftar Akun Baru</h2>
+          <p>Pilih jenis akun yang ingin Anda daftarkan</p>
+        </div>
+        
+        <form class="formulir-aplikasi">
+          <div class="opsi-masuk" style="margin-bottom: 20px;">
+            <button type="button" class="opsi-masuk-item aktif" data-target="pencari-kerja">Pencari Kerja</button>
+            <button type="button" class="opsi-masuk-item" data-target="perusahaan">Perusahaan</button>
+          </div>
+
+          <div id="form-pencari-kerja" class="bagian-formulir">
+            <h3>Informasi Akun Pencari Kerja</h3>
+            <div class="baris-formulir">
+              <div class="grup-formulir">
+                <label for="reg-js-namaLengkap">Nama Lengkap <span class="wajib">*</span></label>
+                <input type="text" id="reg-js-namaLengkap" name="namaLengkap" placeholder="Masukkan nama lengkap" required>
+              </div>
+              <div class="grup-formulir">
+                <label for="reg-js-email">Email <span class="wajib">*</span></label>
+                <input type="email" id="reg-js-email" name="email" placeholder="contoh@email.com" required>
+              </div>
+            </div>
+            <div class="baris-formulir">
+              <div class="grup-formulir">
+                <label for="reg-js-password">Password <span class="wajib">*</span></label>
+                <input type="password" id="reg-js-password" name="password" placeholder="Minimal 8 karakter" required>
+              </div>
+              <div class="grup-formulir">
+                <label for="reg-js-konfirmasiPassword">Konfirmasi Password <span class="wajib">*</span></label>
+                <input type="password" id="reg-js-konfirmasiPassword" name="konfirmasiPassword" placeholder="Ulangi password" required>
+              </div>
+            </div>
+          </div>
+
+          <div id="form-perusahaan" class="bagian-formulir" style="display:none;">
+            <h3>Informasi Akun Perusahaan</h3>
+            <div class="baris-formulir">
+              <div class="grup-formulir">
+                <label for="reg-comp-namaPerusahaan">Nama Perusahaan <span class="wajib">*</span></label>
+                <input type="text" id="reg-comp-namaPerusahaan" name="namaPerusahaan" placeholder="Masukkan nama perusahaan" required>
+              </div>
+              <div class="grup-formulir">
+                <label for="reg-comp-emailPerusahaan">Email Perusahaan <span class="wajib">*</span></label>
+                <input type="email" id="reg-comp-emailPerusahaan" name="emailPerusahaan" placeholder="contoh@perusahaan.com" required>
+              </div>
+            </div>
+            <div class="baris-formulir">
+              <div class="grup-formulir">
+                <label for="reg-comp-password">Password <span class="wajib">*</span></label>
+                <input type="password" id="reg-comp-password" name="password" placeholder="Minimal 8 karakter" required>
+              </div>
+              <div class="grup-formulir">
+                <label for="reg-comp-konfirmasiPassword">Konfirmasi Password <span class="wajib">*</span></label>
+                <input type="password" id="reg-comp-konfirmasiPassword" name="konfirmasiPassword" placeholder="Ulangi password" required>
+              </div>
+            </div>
+             <div class="grup-formulir">
+                <label for="reg-comp-industri">Industri</label>
+                <input type="text" id="reg-comp-industri" name="industri" placeholder="Contoh: IT, Manufaktur, dll.">
+            </div>
+            <div class="grup-formulir">
+                <label for="reg-comp-alamat">Alamat Perusahaan</label>
+                <textarea id="reg-comp-alamat" name="alamat" rows="3" placeholder="Masukkan alamat lengkap perusahaan"></textarea>
+            </div>
+          </div>
+          
+          <div class="aksi-formulir">
+            <p class="pemberitahuan-ketentuan">
+              Dengan mendaftar, Anda menyetujui <a href="#">Ketentuan Layanan</a> dan <a href="#">Kebijakan Privasi</a> kami.
+            </p>
+            <button type="submit" class="tombol-kirim">Daftar Sekarang</button>
+          </div>
+          <div class="footer-formulir" style="margin-top: 15px;">
+            <p>Sudah punya akun? <a href="login.html">Masuk di sini</a></p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="konten-footer">
+        <div class="tentang-footer">
+          <h3>BawaMap</h3>
+          <p>Platform pencarian kerja terbaik di Indonesia. Menghubungkan pencari kerja dengan perusahaan terkemuka.</p>
+        </div>
+        <div class="tautan-footer">
+          <div class="kolom-footer">
+            <h4>Menu</h4>
+            <ul>
+              <li><a href="index.html">Beranda</a></li>
+              <li><a href="#">Lowongan</a></li>
+              <li><a href="#">Perusahaan</a></li>
+              <li><a href="#">Tips Karir</a></li>
+            </ul>
+          </div>
+          <div class="kolom-footer">
+            <h4>Kategori</h4>
+            <ul>
+              <li><a href="#">IT & Teknologi</a></li>
+              <li><a href="#">Keuangan</a></li>
+              <li><a href="#">Pendidikan</a></li>
+              <li><a href="#">Kesehatan</a></li>
+              <li><a href="#">Pemasaran</a></li>
+            </ul>
+          </div>
+          <div class="kolom-footer">
+            <h4>Info Perusahaan</h4>
+            <ul>
+              <li><a href="#">Tentang Kami</a></li>
+              <li><a href="#">Hubungi Kami</a></li>
+              <li><a href="#">Kebijakan Privasi</a></li>
+              <li><a href="#">Syarat & Ketentuan</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bawah">
+        <p>&copy; www.BawaMap.co.id</p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const opsiMasukItems = document.querySelectorAll('.opsi-masuk-item');
+      const formPencariKerja = document.getElementById('form-pencari-kerja');
+      const formPerusahaan = document.getElementById('form-perusahaan');
+
+      opsiMasukItems.forEach(item => {
+        item.addEventListener('click', function() {
+          opsiMasukItems.forEach(btn => btn.classList.remove('aktif'));
+          this.classList.add('aktif');
+
+          const targetForm = this.getAttribute('data-target');
+          if (targetForm === 'pencari-kerja') {
+            formPencariKerja.style.display = 'block';
+            formPerusahaan.style.display = 'none';
+            // Set required attributes for job seeker form
+            formPencariKerja.querySelectorAll('input').forEach(input => input.setAttribute('required', ''));
+            formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('required'));
+          } else {
+            formPencariKerja.style.display = 'none';
+            formPerusahaan.style.display = 'block';
+            // Set required attributes for company form
+            formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.setAttribute('required', ''));
+            formPencariKerja.querySelectorAll('input').forEach(input => input.removeAttribute('required'));
+          }
+        });
+      });
+
+      // Initialize form display based on active tab
+      if (opsiMasukItems[0].classList.contains('aktif')) {
+        formPencariKerja.style.display = 'block';
+        formPerusahaan.style.display = 'none';
+        formPencariKerja.querySelectorAll('input').forEach(input => input.setAttribute('required', ''));
+        formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('required'));
+      }
+    });
+  </script>
+</body>
+</html>

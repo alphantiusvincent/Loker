@@ -1,0 +1,1080 @@
+:root {
+  --warna-primer: #2563eb;
+  --warna-primer-hover: #1d4ed8;
+  --warna-sekunder: #f3f4f6;
+  --warna-sekunder-hover:rgb(60, 113, 220);
+  --warna-teks: #111827;
+  --warna-teks-sekunder: #4b5563;
+  --warna-teks-terang: #9ca3af;
+  --warna-border: #e5e7eb;
+  --warna-latar: #ffffff;
+  --background: #f9fafb;
+  --warna-sukses: #10b981;
+  --warna-peringatan: #f59e0b;
+  --warning: #ef4444;
+  --warna-info: #3b82f6;
+  --bayangan: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --bayangan-medium: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --bayangan-besar: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --radius: 0.5rem;
+  --spacing: 1rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: var(--warna-teks);
+  background-color: var(--background);
+}
+
+a {
+  color: var(--warna-primer);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: var(--warna-primer-hover);
+}
+
+ul {
+  list-style: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--spacing);
+}
+
+.navigasi {
+  background-color: var(--warna-latar);
+  box-shadow: var(--bayangan);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navigasi .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.merek-navigasi a {
+  color: var(--warna-teks);
+  font-weight: 700;
+  font-size: 1.5rem;
+}
+
+.merek-navigasi a:hover {
+  color: var(--warna-primer);
+}
+
+.menu-navigasi ul {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.menu-navigasi a {
+  color: var(--warna-teks);
+  font-weight: 500;
+}
+
+.menu-navigasi a:hover {
+  color: var(--warna-primer);
+}
+
+.otentikasi-navigasi {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.tombol-masuk, .tombol-daftar {
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tombol-masuk {
+  background-color: transparent;
+  border: 1px solid var(--warna-border);
+  color: var(--warna-teks);
+}
+
+.tombol-masuk:hover {
+  background-color: var(--warna-sekunder);
+}
+
+.tombol-daftar {
+  background-color: var(--warna-primer);
+  border: 1px solid var(--warna-primer);
+  color: white;
+}
+
+.tombol-daftar:hover {
+  background-color: var(--warna-primer-hover);
+  border-color: var(--warna-primer-hover);
+}
+
+.hero {
+  text-align: center;
+  padding: 3rem 0;
+}
+
+.hero h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--warna-teks);
+}
+
+.hero p {
+  font-size: 1.125rem;
+  color: var(--warna-teks-sekunder);
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Search Section */
+.bagian-pencarian {
+  margin: 2rem 0;
+}
+
+.kartu-pencarian {
+  background-color: var(--warna-latar);
+  border-radius: var(--radius);
+  box-shadow: var(--bayangan-medium);
+  overflow: hidden;
+}
+
+.kepala-pencarian {
+  background-color: var(--warna-sekunder);
+  padding: 1rem;
+  border-bottom: 1px solid var(--warna-border);
+}
+
+.kepala-pencarian h2 {
+  font-size: 1.25rem;
+  color: var(--warna-teks);
+}
+
+.badan-pencarian {
+  padding: 1.5rem;
+}
+
+.formulir-pencarian {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.baris-pencarian {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.kolom-pencarian {
+  flex: 1;
+  min-width: 250px;
+}
+
+.kolom-pencarian label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--warna-teks);
+}
+
+.kolom-pencarian input, 
+.kolom-pencarian select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--warna-border);
+  border-radius: var(--radius);
+  background-color: var(--warna-latar);
+  transition: border-color 0.3s ease;
+}
+
+.kolom-pencarian input:focus, 
+.kolom-pencarian select:focus {
+  outline: none;
+  border-color: var(--warna-primer);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.kolom-pencarian-tombol {
+  display: flex;
+  align-items: flex-end;
+}
+
+.tombol-cari {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--warna-primer);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tombol-cari:hover {
+  background-color: var(--warna-primer-hover);
+}
+
+.bagian-daftar-pekerjaan {
+  margin: 3rem 0;
+}
+
+.kepala-daftar {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.kepala-daftar h2 {
+  font-size: 1.875rem;
+  color: var(--warna-teks);
+  margin-bottom: 0.5rem;
+}
+
+.kepala-daftar p {
+  color: var(--warna-teks-sekunder);
+}
+
+.daftar-pekerjaan {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.kartu-pekerjaan {
+  background-color: var(--warna-latar);
+  border-radius: var(--radius);
+  box-shadow: var(--bayangan);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.kartu-pekerjaan:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--bayangan-medium);
+}
+
+.kepala-kartu {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 1px solid var(--warna-sekunder);
+}
+
+.logo-perusahaan {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--warna-sekunder);
+}
+
+.logo-perusahaan img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.logo-perusahaan1 {
+  width: 70px;
+  height: 70px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-perusahaan1 img {
+  width: 40px;
+  height: 40px;
+  float : left;
+}
+
+.tag-pekerjaan {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.kategori-pekerjaan, .jenis-pekerjaan {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border-radius: 9999px;
+}
+
+.kategori-pekerjaan-it {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.kategori-pekerjaan-keuangan {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.kategori-pekerjaan-pendidikan {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.kategori-pekerjaan-kesehatan {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.kategori-pekerjaan-pemasaran {
+  background-color: #e9d5ff;
+  color: #6d28d9;
+}
+
+.jenis-pekerjaan-fulltime {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.jenis-pekerjaan-parttime {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.jenis-pekerjaan-remote {
+  background-color: #d1fae5;
+  color: #047857;
+}
+
+.jenis-pekerjaan-freelance {
+  background-color: #e9d5ff;
+  color: #6d28d9;
+}
+
+.konten-kartu {
+  padding: 1rem;
+}
+
+.judul-pekerjaan {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+}
+
+.judul-pekerjaan a {
+  color: var(--warna-teks);
+}
+
+.judul-pekerjaan a:hover {
+  color: var(--warna-primer);
+}
+
+.nama-perusahaan {
+  font-size: 0.875rem;
+  color: var(--warna-teks-sekunder);
+  margin-bottom: 0.5rem;
+}
+
+.lokasi-pekerjaan {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--warna-teks-sekunder);
+  margin-bottom: 0.75rem;
+}
+
+.ikon-kecil {
+  width: 16px;
+  height: 16px;
+}
+
+.footer-kartu {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--warna-sekunder);
+  font-size: 0.875rem;
+}
+
+.gaji-pekerjaan {
+  font-weight: 600;
+  color: var(--warna-teks);
+}
+
+.deadline-pekerjaan {
+  font-size: 0.75rem;
+  color: var(--warna-teks-terang);
+}
+
+.muat-lagi {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.tombol-muat-lagi {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--warna-sekunder);
+  color: var(--warna-teks);
+  border: 1px solid var(--warna-border);
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tombol-muat-lagi:hover {
+  background-color: var(--warna-sekunder-hover);
+}
+
+.tautan-kembali {
+  margin: 1.5rem 0;
+}
+
+.tautan-kembali a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--warna-teks-sekunder);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.tautan-kembali a:hover {
+  color: var(--warna-primer);
+}
+
+.container-detail-pekerjaan {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.utama-detail-pekerjaan, .sidebar-detail-pekerjaan {
+  background-color: var(--warna-latar);
+  border-radius: var(--radius);
+  box-shadow: var(--bayangan);
+  overflow: hidden;
+}
+
+.header-detail-pekerjaan {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--warna-border);
+  display: flex;
+  gap: 1.5rem;
+}
+
+.logo-perusahaan-besar {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--warna-sekunder);
+  flex-shrink: 0;
+}
+
+.logo-perusahaan-besar img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+.judul-detail-pekerjaan {
+  flex-grow: 1;
+}
+
+.judul-detail-pekerjaan h1 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--warna-teks);
+}
+
+.info-perusahaan {
+  margin-bottom: 1rem;
+}
+
+.info-perusahaan h2 {
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--warna-teks-sekunder);
+  margin-bottom: 0.5rem;
+}
+
+.lokasi-pekerjaan {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--warna-teks-sekunder);
+}
+
+.tag-pekerjaan-besar {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.container-tombol-lamar {
+  padding: 1rem 1.5rem;
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid var(--warna-border);
+}
+
+.tombol-lamar {
+  padding: 0.75rem 1.5rem;
+  background-color: var(--warna-primer);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease;
+  flex: 1;
+}
+
+.tombol-lamar:hover {
+  background-color: green;
+  color : white;
+}
+
+.tombol-simpan {
+  padding: 0.75rem 1.5rem;
+  background-color: white;
+  color: var(--warna-teks);
+  border: 1px solid var(--warna-border);
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tombol-simpan:hover {
+  background-color: var(--warna-sekunder);
+}
+
+.konten-detail-pekerjaan {
+  padding: 1.5rem;
+}
+
+.bagian-pekerjaan {
+  margin-bottom: 2rem;
+}
+
+.bagian-pekerjaan:last-child {
+  margin-bottom: 0;
+}
+
+.bagian-pekerjaan h3 {
+  font-size: 1.25rem;
+  color: var(--warna-teks);
+  margin-bottom: 1rem;
+  border-bottom: 1px solid var(--warna-sekunder);
+  padding-bottom: 0.5rem;
+}
+
+.deskripsi-pekerjaan p {
+  margin-bottom: 1rem;
+}
+
+.deskripsi-pekerjaan ul, .kualifikasi-pekerjaan ul, .manfaat-pekerjaan ul {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.deskripsi-pekerjaan li, .kualifikasi-pekerjaan li, .manfaat-pekerjaan li {
+  margin-bottom: 0.5rem;
+  position: relative;
+  list-style-type: disc;
+}
+
+.sidebar-detail-pekerjaan > div {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--warna-border);
+}
+
+.sidebar-detail-pekerjaan > div:last-child {
+  border-bottom: none;
+}
+
+.ringkasan-pekerjaan h3, .ringkasan-perusahaan h3 {
+  font-size: 1.125rem;
+  color: var(--warna-teks);
+  margin-bottom: 1rem;
+}
+
+.item-ringkasan {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--warna-sekunder);
+}
+
+.item-ringkasan:last-child {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.label-ringkasan {
+  color: var(--warna-teks-sekunder);
+  font-size: 0.875rem;
+}
+
+.nilai-ringkasan {
+  font-weight: 500;
+  color: var(--warna-teks);
+  font-size: 0.875rem;
+}
+
+.ringkasan-perusahaan p {
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  color: var(--warna-teks-sekunder);
+}
+
+.tautan-perusahaan {
+  display: inline-block;
+  color: var(--warna-primer);
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.aksi-pekerjaan {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tombol-penuh {
+  width: 100%;
+  display: block;
+}
+
+.tombol-bagikan {
+  width: 100%;
+  padding: 0.75rem 1.5rem;
+  background-color: white;
+  color: var(--warna-teks);
+  border: 1px solid var(--warna-border);
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tombol-bagikan:hover {
+  background-color: var(--warna-sekunder);
+}
+
+
+.container-aplikasi {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 1.5rem;
+}
+
+.sidebar-aplikasi {
+  position: sticky;
+  top: 5rem;
+  align-self: start;
+}
+
+.kartu-ringkasan-kerja {
+  background-color: var(--warna-latar);
+  border-radius: var(--radius);
+  box-shadow: var(--bayangan);
+  overflow: hidden;
+}
+
+.header-ringkasan-kerja {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--warna-border);
+  display: flex;
+  gap: 1rem;
+}
+
+.detail-ringkasan-kerja {
+  padding: 1.5rem;
+}
+
+.utama-aplikasi {
+  flex-grow: 1;
+}
+
+.container-formulir-aplikasi {
+  background-color: var(--warna-latar);
+  border-radius: var(--radius);
+  box-shadow: var(--bayangan);
+  overflow: hidden;
+}
+
+.header-formulir-aplikasi {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--warna-border);
+}
+
+.header-formulir-aplikasi h2 {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--warna-teks);
+}
+
+.header-formulir-aplikasi p {
+  color: var(--warna-teks-sekunder);
+}
+
+.formulir-aplikasi {
+  padding: 1.5rem;
+}
+
+.bagian-formulir {
+  margin-bottom: 2rem;
+}
+
+.bagian-formulir h3 {
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--warna-sekunder);
+}
+
+.baris-formulir {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.grup-formulir {
+  flex: 1;
+  min-width: 250px;
+  margin-bottom: 1rem;
+}
+
+.grup-formulir label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.wajib {
+  color: var(--warning);
+}
+
+.grup-formulir input, .grup-formulir textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--warna-border);
+  border-radius: var(--radius);
+  transition: border-color 0.3s ease;
+}
+
+.grup-formulir input:focus, .grup-formulir textarea:focus {
+  outline: none;
+  border-color: var(--warna-primer);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.container-input-berkas {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.label-input-berkas {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: var(--warna-sekunder);
+  border: 1px solid var(--warna-border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.label-input-berkas:hover {
+  background-color: var(--warna-sekunder-hover);
+}
+
+input[type="file"] {
+  display: none;
+}
+
+.nama-berkas {
+  flex: 1;
+  font-size: 0.875rem;
+  color: var(--warna-teks-sekunder);
+}
+
+.petunjuk-bidang {
+  font-size: 0.75rem;
+  color: var(--warna-teks-terang);
+}
+
+.aksi-formulir {
+  padding-top: 1rem;
+  border-top: 1px solid var(--warna-border);
+}
+
+.pemberitahuan-ketentuan {
+  font-size: 0.875rem;
+  color: var(--warna-teks-sekunder);
+  margin-bottom: 1rem;
+}
+
+.tombol-kirim {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: var(--warna-primer);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.tombol-kirim:hover {
+  background-color: var(--warna-primer-hover);
+}
+
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  overflow: auto;
+}
+
+.konten-modal {
+  background-color: var(--warna-latar);
+  margin: 10% auto;
+  padding: 2rem;
+  border-radius: var(--radius);
+  max-width: 500px;
+  box-shadow: var(--bayangan-besar);
+  position: relative;
+}
+
+.tutup-modal {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--warna-teks-terang);
+}
+
+.konten-modal h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.opsi-masuk {
+  display: flex;
+  margin-bottom: 1.5rem;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--warna-border);
+}
+
+.opsi-masuk-item {
+  flex: 1;
+  padding: 0.75rem;
+  text-align: center;
+  background-color: var(--warna-sekunder);
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  border: none;
+  font-weight: 500;
+}
+
+.opsi-masuk-item.aktif {
+  background-color: white;
+  color: var(--warna-primer);
+}
+
+.formulir-masuk .grup-formulir {
+  margin-bottom: 1.25rem;
+}
+
+.grup-kotak-centang {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.grup-kotak-centang input {
+  width: auto;
+}
+
+.footer-formulir {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.footer-formulir a {
+  color: var(--warna-primer);
+  font-weight: 500;
+}
+
+.footer-formulir p {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--warna-teks-sekunder);
+}
+
+.footer {
+  background-color: var(--warna-latar);
+  border-top: 1px solid var(--warna-border);
+  padding: 3rem 0 1.5rem;
+  margin-top: 3rem;
+}
+
+.konten-footer {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.tentang-footer h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  color: var(--warna-teks);
+}
+
+.tentang-footer p {
+  color: var(--warna-teks-sekunder);
+  max-width: 300px;
+}
+
+.tautan-footer {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+}
+
+.kolom-footer h4 {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: var(--warna-teks);
+}
+
+.kolom-footer ul li {
+  margin-bottom: 0.5rem;
+}
+
+.kolom-footer a {
+  color: var(--warna-teks-sekunder);
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.kolom-footer a:hover {
+  color: var(--warna-primer);
+}
+
+.footer-bawah {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--warna-border);
+  color: var(--warna-teks-terang);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 992px) {
+  .container-detail-pekerjaan,
+  .container-aplikasi {
+    grid-template-columns: 1fr;
+  }
+  
+  .sidebar-aplikasi {
+    position: static;
+  }
+  
+  .kartu-ringkasan-kerja {
+    margin-bottom: 1.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .konten-footer {
+    grid-template-columns: 1fr;
+  }
+  
+  .tautan-footer {
+    grid-template-columns: 1fr 1fr;
+  }
+  
+  .header-detail-pekerjaan {
+    flex-direction: column;
+  }
+  
+  .menu-navigasi {
+    display: none;
+  }
+}
+
+@media (max-width: 576px) {
+  .header-ringkasan-kerja {
+    flex-direction: column;
+  }
+  
+  .tautan-footer {
+    grid-template-columns: 1fr;
+  }
+}

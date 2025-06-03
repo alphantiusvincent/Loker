@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BawaMap</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="Image/logo-BM.png" type="image/x-icon">
+</head>
+<body>
+  <header class="navigasi">
+    <div class="container">
+      <div class="merek-navigasi">
+        <div class="kepala-kartu">
+          <div class="logo-perusahaan1">
+            <img src="Image/logo-BM.png" alt="logo-BM">
+            
+          </div>
+          <a href="index.html">
+            <h1>BawaMap</h1>
+        </a>
+        </div>
+      </div>
+      <nav class="menu-navigasi">
+        <ul>
+          <li><a href="index.html">Beranda</a></li>
+          <li><a href="#">Kategori</a></li>
+          <li><a href="#">Perusahaan</a></li>
+          <li><a href="#">Tentang Kami</a></li>
+        </ul>
+      </nav>
+      <div class="otentikasi-navigasi">
+        <a href="login.html"><button class="tombol-masuk">Masuk</button></a>
+        <a href="register.html"><button class="tombol-daftar">Daftar</button></a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <section class="hero">
+        <h1>Temukan Pekerjaan Impian Anda</h1>
+        <p>Lebih dari 10.000 lowongan pekerjaan dari berbagai industri tersedia untuk Anda</p>
+      </section>
+
+      
+      <section class="bagian-pencarian">
+        <div class="kartu-pencarian">
+          <div class="kepala-pencarian">
+            <h2>Cari Lowongan</h2>
+          </div>
+          <div class="badan-pencarian">
+            <form class="formulir-pencarian">
+              <div class="baris-pencarian">
+                <div class="kolom-pencarian">
+                  <label for="kataKunci">Kata Kunci</label>
+                  <input type="text" id="kataKunci" name="kataKunci" placeholder="Posisi, jabatan, atau keahlian">
+                </div>
+                <div class="kolom-pencarian">
+                  <label for="kategori">Kategori</label>
+                  <select id="kategori" name="kategori">
+                    <option value="">Semua Kategori</option>
+                    <option value="it">IT & Teknologi</option>
+                    <option value="keuangan">Keuangan</option>
+                    <option value="pendidikan">Pendidikan</option>
+                    <option value="kesehatan">Kesehatan</option>
+                    <option value="pemasaran">Pemasaran</option>
+                  </select>
+                </div>
+              </div>
+              <div class="baris-pencarian">
+                <div class="kolom-pencarian">
+                  <label for="lokasi">Lokasi</label>
+                  <select id="lokasi" name="lokasi">
+                    <option value="">Semua Lokasi</option>
+                    <option value="jakarta">Jakarta</option>
+                    <option value="bandung">Bandung</option>
+                    <option value="surabaya">Surabaya</option>
+                    <option value="yogyakarta">Yogyakarta</option>
+                    <option value="medan">Medan</option>
+                  </select>
+                </div>
+                <div class="kolom-pencarian">
+                  <label for="jenisPekerjaan">Jenis Pekerjaan</label>
+                  <select id="jenisPekerjaan" name="jenisPekerjaan">
+                    <option value="">Semua Jenis</option>
+                    <option value="full-time">Full-time</option>
+                    <option value="part-time">Part-time</option>
+                    <option value="remote">Remote</option>
+                    <option value="freelance">Freelance</option>
+                  </select>
+                </div>
+              </div>
+              <div class="baris-pencarian">
+                <div class="kolom-pencarian">
+                  <label for="gaji">Rentang Gaji</label>
+                  <select id="gaji" name="gaji">
+                    <option value="">Semua Gaji</option>
+                    <option value="0-5">Rp0 - Rp5 juta</option>
+                    <option value="5-10">Rp5 - Rp10 juta</option>
+                    <option value="10-15">Rp10 - Rp15 juta</option>
+                    <option value="15-20">Rp15 - Rp20 juta</option>
+                    <option value="20+">Rp20 juta+</option>
+                  </select>
+                </div>
+                <div class="kolom-pencarian kolom-pencarian-tombol">
+                  <button type="submit" class="tombol-cari">Cari Lowongan</button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+           <section class="bagian-daftar-pekerjaan">
+        <div class="kepala-daftar">
+          <h2>Lowongan Pekerjaan Terbaru</h2>
+          <p>Daftar lowongan pekerjaan yang baru ditambahkan di platform kami</p>
+        </div>
+
+        <div class="daftar-pekerjaan">
+                 <div class="kartu-pekerjaan">
+            <div class="kepala-kartu">
+              <div class="logo-perusahaan">
+                <img src="Image/logo-3.png" alt="Logo PT Teknologi Maju">
+              </div>
+              <div class="tag-pekerjaan">
+                <span class="kategori-pekerjaan kategori-pekerjaan-it">IT</span>
+                <span class="jenis-pekerjaan jenis-pekerjaan-fulltime">Full-time</span>
+              </div>
+            </div>
+            <div class="konten-kartu">
+              <h3 class="judul-pekerjaan"><a href="detail.html?id=1">Senior Frontend Developer</a></h3>
+              <p class="nama-perusahaan">PT Teknologi Maju</p>
+              <div class="lokasi-pekerjaan">
+                <img src="Image/logo-6.jpeg" alt="Lokasi" class="ikon-kecil">
+                <span>Jakarta Selatan, DKI Jakarta</span>
+              </div>
+              <div class="footer-kartu">
+                <div class="gaji-pekerjaan">Rp15-25 juta/bulan</div>
+                <div class="deadline-pekerjaan">Deadline: 30 Juni 2025</div>
+              </div>
+            </div>
+          </div>
+
+                 <div class="kartu-pekerjaan">
+            <div class="kepala-kartu">
+              <div class="logo-perusahaan">
+                <img src="Image/logo-2.png" alt="Logo Bank Finansial Indonesia">
+              </div>
+              <div class="tag-pekerjaan">
+                <span class="kategori-pekerjaan kategori-pekerjaan-keuangan">Keuangan</span>
+                <span class="jenis-pekerjaan jenis-pekerjaan-fulltime">Full-time</span>
+              </div>
+            </div>
+            <div class="konten-kartu">
+              <h3 class="judul-pekerjaan"><a href="detail.html?id=2">Financial Analyst</a></h3>
+              <p class="nama-perusahaan">Bank Indonesia</p>
+              <div class="lokasi-pekerjaan">
+                <img src="Image/logo-6.jpeg" alt="Lokasi" class="ikon-kecil">
+                <span>Jakarta Pusat, DKI Jakarta</span>
+              </div>
+              <div class="footer-kartu">
+                <div class="gaji-pekerjaan">Rp10-15 juta/bulan</div>
+                <div class="deadline-pekerjaan">Deadline: 15 Juli 2025</div>
+              </div>
+            </div>
+          </div>
+
+                 <div class="kartu-pekerjaan">
+            <div class="kepala-kartu">
+              <div class="logo-perusahaan">
+                <img src="Image/logo-1.jpeg" alt="Logo Universitas Pendidikan Nasional">
+              </div>
+              <div class="tag-pekerjaan">
+                <span class="kategori-pekerjaan kategori-pekerjaan-pendidikan">Pendidikan</span>
+                <span class="jenis-pekerjaan jenis-pekerjaan-parttime">Part-time</span>
+              </div>
+            </div>
+            <div class="konten-kartu">
+              <h3 class="judul-pekerjaan"><a href="detail.html?id=3">Dosen Ilmu Komputer</a></h3>
+              <p class="nama-perusahaan">Universitas Pendidikan Nasional</p>
+              <div class="lokasi-pekerjaan">
+                <img src="Image/logo-7.png" alt="Lokasi" class="ikon-kecil">
+                <span>Bandung, Jawa Barat</span>
+              </div>
+              <div class="footer-kartu">
+                <div class="gaji-pekerjaan">Rp5-10 juta/bulan</div>
+                <div class="deadline-pekerjaan">Deadline: 25 Juni 2025</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="kartu-pekerjaan">
+            <div class="kepala-kartu">
+              <div class="logo-perusahaan">
+                <img src="Image/logo-1.png" alt="Logo Rumah Sakit Sehat Sejahtera">
+              </div>
+              <div class="tag-pekerjaan">
+                <span class="kategori-pekerjaan kategori-pekerjaan-kesehatan">Kesehatan</span>
+                <span class="jenis-pekerjaan jenis-pekerjaan-fulltime">Full-time</span>
+              </div>
+            </div>
+            <div class="konten-kartu">
+              <h3 class="judul-pekerjaan"><a href="detail.html?id=4">Kepala Bagian IT</a></h3>
+              <p class="nama-perusahaan">Rumah Sakit Sehat Sejahtera</p>
+              <div class="lokasi-pekerjaan">
+                <img src="Image/logo-8.png" alt="Lokasi" class="ikon-kecil">
+                <span>Surabaya, Jawa Timur</span>
+              </div>
+              <div class="footer-kartu">
+                <div class="gaji-pekerjaan">Rp15-20 juta/bulan</div>
+                <div class="deadline-pekerjaan">Deadline: 10 Juli 2025</div>
+              </div>
+            </div>
+          </div>
+
+                 <div class="kartu-pekerjaan">
+            <div class="kepala-kartu">
+              <div class="logo-perusahaan">
+                <img src="Image/logo-4.png" alt="Logo Kreasi Digital">
+              </div>
+              <div class="tag-pekerjaan">
+                <span class="kategori-pekerjaan kategori-pekerjaan-pemasaran">Pemasaran</span>
+                <span class="jenis-pekerjaan jenis-pekerjaan-remote">Remote</span>
+              </div>
+            </div>
+            <div class="konten-kartu">
+              <h3 class="judul-pekerjaan"><a href="detail.html?id=5">Social Media Manager</a></h3>
+              <p class="nama-perusahaan">Kreasi Digital</p>
+              <div class="lokasi-pekerjaan">
+                <img src="Image/logo-6.jpeg" alt="Lokasi" class="ikon-kecil">
+                <span>jakarta Timur, DKI Jakarta</span>
+              </div>
+              <div class="footer-kartu">
+                <div class="gaji-pekerjaan">Rp8-12 juta/bulan</div>
+                <div class="deadline-pekerjaan">Deadline: 5 Juli 2025</div>
+              </div>
+            </div>
+          </div>
+
+                 <div class="kartu-pekerjaan">
+            <div class="kepala-kartu">
+              <div class="logo-perusahaan">
+                <img src="Image/logo-5.jpeg" alt="Logo PT Inovasi Global">
+              </div>
+              <div class="tag-pekerjaan">
+                <span class="kategori-pekerjaan kategori-pekerjaan-it">IT</span>
+                <span class="jenis-pekerjaan jenis-pekerjaan-freelance">Freelance</span>
+              </div>
+            </div>
+            <div class="konten-kartu">
+              <h3 class="judul-pekerjaan"><a href="detail.html?id=6">UI/UX Designer</a></h3>
+              <p class="nama-perusahaan">PT Inovasi Global</p>
+              <div class="lokasi-pekerjaan">
+                <img src="Image/logo-9.png" alt="Lokasi" class="ikon-kecil">
+                <span>Yogyakarta, DIY</span>
+              </div>
+              <div class="footer-kartu">
+                <div class="gaji-pekerjaan">Rp5-10 juta/project</div>
+                <div class="deadline-pekerjaan">Deadline: 20 Juni 2025</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="muat-lagi">
+          <button class="tombol-muat-lagi">Muat Lebih Banyak</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div class="modal" id="modalMasuk">
+    <div class="konten-modal">
+      <span class="tutup-modal">&times;</span>
+      <h2>Masuk ke Akun Anda</h2>
+      
+      <div class="opsi-masuk">
+        <button class="opsi-masuk-item aktif" data-target="pencari-kerja">Pencari Kerja</button>
+        <button class="opsi-masuk-item" data-target="perusahaan">Perusahaan</button>
+      </div>
+      
+      <form class="formulir-masuk">
+        <div class="grup-formulir">
+          <label for="namapengguna">Username atau Email</label>
+          <input type="text" id="namapengguna" name="namapengguna" required>
+        </div>
+        
+        <div class="grup-formulir">
+          <label for="katasandi">Password</label>
+          <input type="password" id="katasandi" name="katasandi" required>
+        </div>
+        
+        <div class="grup-formulir grup-kotak-centang">
+          <input type="checkbox" id="ingat" name="ingat">
+          <label for="ingat">Ingat saya</label>
+        </div>
+        
+        <button type="submit" class="tombol-kirim">Masuk</button>
+        
+        <div class="footer-formulir">
+          <a href="#">Lupa password?</a>
+         <p>Belum punya akun? <a href="register.html">Daftar sekarang</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="konten-footer">
+        <div class="tentang-footer">
+          <h3>BawaMap</h3>
+          <p>Platform pencarian kerja terbaik di Indonesia. Menghubungkan pencari kerja dengan perusahaan terkemuka.</p>
+        </div>
+        
+        <div class="tautan-footer">
+          <div class="kolom-footer">
+            <h4>Menu</h4>
+            <ul>
+              <li><a href="index.html">Beranda</a></li>
+              <li><a href="#">Lowongan</a></li>
+              <li><a href="#">Perusahaan</a></li>
+              <li><a href="#">Tips Karir</a></li>
+            </ul>
+          </div>
+          
+          <div class="kolom-footer">
+            <h4>Kategori</h4>
+            <ul>
+              <li><a href="#">IT & Teknologi</a></li>
+              <li><a href="#">Keuangan</a></li>
+              <li><a href="#">Pendidikan</a></li>
+              <li><a href="#">Kesehatan</a></li>
+              <li><a href="#">Pemasaran</a></li>
+            </ul>
+          </div>
+          
+          <div class="kolom-footer">
+            <h4>Info Perusahaan</h4>
+            <ul>
+              <li><a href="#">Tentang Kami</a></li>
+              <li><a href="#">Hubungi Kami</a></li>
+              <li><a href="#">Kebijakan Privasi</a></li>
+              <li><a href="#">Syarat & Ketentuan</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bawah">
+        <p>&copy; www.BawaMap.co.id</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

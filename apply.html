@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lamar Pekerjaan - Senior Frontend Developer | bawaMap</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="Image/logo-BM.png" type="image/x-icon">
+</head>
+<body>
+
+  <header class="navigasi">
+    <div class="container">
+      <div class="merek-navigasi">
+        <div class="kepala-kartu">
+          <div class="logo-perusahaan1">
+            <img src="Image/logo-BM.png" alt="logo-BM">
+            
+          </div>
+          <a href="index.html">
+            <h1>BawaMap</h1>
+        </a>
+        </div>
+      </div>
+      <nav class="menu-navigasi">
+        <ul>
+          <li><a href="index.html">Beranda</a></li>
+          <li><a href="#">Kategori</a></li>
+          <li><a href="#">Perusahaan</a></li>
+          <li><a href="#">Tentang Kami</a></li>
+        </ul>
+      </nav>
+      <div class="otentikasi-navigasi">
+        <a href="login.html"><button class="tombol-masuk">Masuk</button></a>
+        <button class="tombol-daftar">Daftar</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <div class="tautan-kembali">
+        <a href="detail.html?id=1">
+          <img src="Image/back.png" alt="Panah Kiri" class="ikon-kecil">
+          <span>Kembali ke Detail Lowongan</span>
+        </a>
+      </div>
+
+      <div class="container-aplikasi">
+        <div class="sidebar-aplikasi">
+          <div class="kartu-ringkasan-kerja">
+            <div class="header-ringkasan-kerja">
+              <div class="logo-perusahaan">
+                <img src="Image/logo-3.png" alt="Logo PT Teknologi Maju">
+              </div>
+              
+              <div class="judul-ringkasan-kerja">
+                <h3>Senior Frontend Developer</h3>
+                <p class="nama-perusahaan">PT Teknologi Maju</p>
+                
+                <div class="lokasi-kerja">
+                  <img src="Image/logo-6.jpeg" alt="Lokasi" class="ikon-kecil">
+                  <span>Jakarta Selatan, DKI Jakarta</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="detail-ringkasan-kerja">
+              <div class="item-ringkasan">
+                <div class="label-ringkasan">Kategori</div>
+                <div class="nilai-ringkasan">IT</div>
+              </div>
+              
+              <div class="item-ringkasan">
+                <div class="label-ringkasan">Jenis</div>
+                <div class="nilai-ringkasan">Full-time</div>
+              </div>
+              
+              <div class="item-ringkasan">
+                <div class="label-ringkasan">Gaji</div>
+                <div class="nilai-ringkasan">Rp15-25 juta/bulan</div>
+              </div>
+              
+              <div class="item-ringkasan">
+                <div class="label-ringkasan">Deadline</div>
+                <div class="nilai-ringkasan">30 Juni 2025</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="utama-aplikasi">
+          <div class="container-formulir-aplikasi">
+            <div class="header-formulir-aplikasi">
+              <h2>Formulir Lamaran</h2>
+              <p>Lengkapi data diri Anda untuk melamar posisi ini</p>
+            </div>
+            
+            <form class="formulir-aplikasi">
+              <div class="bagian-formulir">
+                <h3>Informasi Pribadi</h3>
+                
+                <div class="baris-formulir">
+                  <div class="grup-formulir">
+                    <label for="namaLengkap">
+                      Nama Lengkap <span class="wajib">*</span>
+                    </label>
+                    <input type="text" id="namaLengkap" name="namaLengkap" placeholder="Masukkan nama lengkap" required>
+                  </div>
+                  
+                  <div class="grup-formulir">
+                    <label for="tanggalLahir">
+                      Tanggal Lahir <span class="wajib">*</span>
+                    </label>
+                    <input type="date" id="tanggalLahir" name="tanggalLahir" required>
+                  </div>
+                </div>
+                
+                <div class="baris-formulir">
+                  <div class="grup-formulir">
+                    <label for="surel">
+                      Email <span class="wajib">*</span>
+                    </label>
+                    <input type="email" id="surel" name="surel" placeholder="contoh@email.com" required>
+                  </div>
+                  
+                  <div class="grup-formulir">
+                    <label for="telepon">
+                      Nomor HP <span class="wajib">*</span>
+                    </label>
+                    <input type="tel" id="telepon" name="telepon" placeholder="contoh: 08123456789" required>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="bagian-formulir">
+                <h3>Dokumen</h3>
+                
+                <div class="grup-formulir">
+                  <label for="cv">
+                    CV (PDF) <span class="wajib">*</span>
+                  </label>
+                  <div class="container-input-berkas">
+                    <label for="cv" class="label-input-berkas">
+                      <img src="Image/unggah.png" alt="Unggah" class="ikon-kecil">
+                      <span>Pilih File</span>
+                    </label>
+                    <input type="file" id="cv" name="cv" accept=".pdf" required>
+                    <span class="nama-berkas">Belum ada file dipilih</span>
+                  </div>
+                  <p class="petunjuk-bidang">Format PDF, maksimal 5MB</p>
+                </div>
+                
+                <div class="grup-formulir">
+                  <label for="portofolio">
+                    Portofolio (PDF, opsional)
+                  </label>
+                  <div class="container-input-berkas">
+                    <label for="portofolio" class="label-input-berkas">
+                      <img src="Image/unggah.png" alt="Unggah" class="ikon-kecil">
+                      <span>Pilih File</span>
+                    </label>
+                    <input type="file" id="portofolio" name="portofolio" accept=".pdf">
+                    <span class="nama-berkas">Belum ada file dipilih</span>
+                  </div>
+                  <p class="petunjuk-bidang">Format PDF, maksimal 5MB</p>
+                </div>
+              </div>
+              
+              <div class="bagian-formulir">
+                <h3>Surat Lamaran (Opsional)</h3>
+                
+                <div class="grup-formulir">
+                  <label for="suratLamaran">
+                    Tuliskan surat lamaran Anda
+                  </label>
+                  <textarea id="suratLamaran" name="suratLamaran" rows="5" placeholder="Jelaskan kenapa Anda adalah kandidat yang tepat untuk posisi ini..."></textarea>
+                </div>
+              </div>
+              
+              <div class="aksi-formulir">
+                <p class="pemberitahuan-ketentuan">
+                  Dengan mengirimkan lamaran ini, Anda menyetujui <a href="#">Ketentuan Layanan</a> dan <a href="#">Kebijakan Privasi</a> kami.
+                </p>
+                
+                <button type="submit" class="tombol-kirim">Kirim Lamaran</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="modal" id="modalMasuk">
+    <div class="konten-modal">
+      <span class="tutup-modal">&times;</span>
+      <h2>Masuk ke Akun Anda</h2>
+      
+      <div class="opsi-masuk">
+        <button class="opsi-masuk-item aktif" data-target="pencari-kerja">Pencari Kerja</button>
+        <button class="opsi-masuk-item" data-target="perusahaan">Perusahaan</button>
+      </div>
+      
+      <form class="formulir-masuk">
+        <div class="grup-formulir">
+          <label for="namapengguna">Username atau Email</label>
+          <input type="text" id="namapengguna" name="namapengguna" required>
+        </div>
+        
+        <div class="grup-formulir">
+          <label for="katasandi">Password</label>
+          <input type="password" id="katasandi" name="katasandi" required>
+        </div>
+        
+        <div class="grup-formulir grup-kotak-centang">
+          <input type="checkbox" id="ingat" name="ingat">
+          <label for="ingat">Ingat saya</label>
+        </div>
+        
+        <button type="submit" class="tombol-kirim">Masuk</button>
+        
+        <div class="footer-formulir">
+          <a href="#">Lupa password?</a>
+          <p>Belum punya akun? <a href="#">Daftar sekarang</a></p>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="konten-footer">
+        <div class="tentang-footer">
+          <h3>BawaMap</h3>
+          <p>Platform pencarian kerja terbaik di Indonesia. Menghubungkan pencari kerja dengan perusahaan terkemuka.</p>
+        </div>
+        
+        <div class="tautan-footer">
+          <div class="kolom-footer">
+            <h4>Menu</h4>
+            <ul>
+              <li><a href="index.html">Beranda</a></li>
+              <li><a href="#">Lowongan</a></li>
+              <li><a href="#">Perusahaan</a></li>
+              <li><a href="#">Tips Karir</a></li>
+            </ul>
+          </div>
+          
+          <div class="kolom-footer">
+            <h4>Kategori</h4>
+            <ul>
+              <li><a href="#">IT & Teknologi</a></li>
+              <li><a href="#">Keuangan</a></li>
+              <li><a href="#">Pendidikan</a></li>
+              <li><a href="#">Kesehatan</a></li>
+              <li><a href="#">Pemasaran</a></li>
+            </ul>
+          </div>
+          
+          <div class="kolom-footer">
+            <h4>Info Perusahaan</h4>
+            <ul>
+              <li><a href="#">Tentang Kami</a></li>
+              <li><a href="#">Hubungi Kami</a></li>
+              <li><a href="#">Kebijakan Privasi</a></li>
+              <li><a href="#">Syarat & Ketentuan</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bawah">
+        <p>&copy; www.BawaMap.co.id</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
