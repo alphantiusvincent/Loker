@@ -1078,3 +1078,38 @@ input[type="file"] {
     grid-template-columns: 1fr;
   }
 }
+
+/* --- Penambahan Gaya untuk Fitur Login/Logout Dinamis --- */
+
+.selamat-datang-user {
+  font-size: 1.1rem; /* Sedikit lebih besar dari font navigasi biasa */
+  color: var(--warna-teks);
+  font-weight: 500;
+  display: flex; /* Menggunakan flexbox untuk penataan ikon, teks, dan tombol */
+  align-items: center; /* Pusatkan secara vertikal */
+  gap: 0.5rem; /* Jarak antara ikon, teks, dan tombol */
+  white-space: nowrap; /* Mencegah teks wrapping jika terlalu panjang */
+}
+
+.selamat-datang-user span#welcome-message {
+  font-weight: 700; /* Membuat nama user lebih bold */
+  color: var(--warna-primer); /* Bisa juga menggunakan warna primer untuk menonjolkan */
+}
+
+/* Gaya untuk tombol Logout baru */
+.tombol-logout {
+  padding: 0.4rem 0.8rem; /* Sedikit lebih kecil dari tombol navigasi utama */
+  background-color: var(--warning); /* Warna merah untuk logout */
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-left: 0.5rem; /* Jarak dari pesan selamat datang */
+  flex-shrink: 0; /* Mencegah tombol menyusut pada layar kecil */
+}
+
+.tombol-logout:hover {
+  background-color: #c0392b; /* Warna merah yang lebih gelap saat hover */
+}

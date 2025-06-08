@@ -170,7 +170,6 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Logic untuk tampilan tombol Masuk/Daftar atau Selamat Datang (sama seperti di index.html)
       const authButtonsContainer = document.getElementById('auth-buttons');
       const welcomeUserContainer = document.querySelector('.selamat-datang-user');
       const welcomeMessageSpan = document.getElementById('welcome-message');
@@ -205,6 +204,7 @@
         localStorage.removeItem('username');
         localStorage.removeItem('userType');
         localStorage.removeItem('userId');
+        localStorage.removeItem('profileId');
         window.location.href = 'login.html';
       }
 
@@ -213,13 +213,12 @@
       }
       checkLoginStatus();
 
-      // Logic untuk form register (pilih pencari kerja/perusahaan)
       const opsiMasukItems = document.querySelectorAll('.opsi-masuk-item');
       const formPencariKerja = document.getElementById('form-pencari-kerja');
       const formPerusahaan = document.getElementById('form-perusahaan');
       const registerForm = document.getElementById('registerForm');
 
-      let currentFormType = 'pencari-kerja'; // Default form
+      let currentFormType = 'pencari-kerja';
 
       opsiMasukItems.forEach(item => {
         item.addEventListener('click', function() {
@@ -230,20 +229,17 @@
           if (currentFormType === 'pencari-kerja') {
             formPencariKerja.style.display = 'block';
             formPerusahaan.style.display = 'none';
-            // Set required attributes for job seeker form
             formPencariKerja.querySelectorAll('input').forEach(input => input.setAttribute('required', ''));
             formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('required'));
           } else {
             formPencariKerja.style.display = 'none';
             formPerusahaan.style.display = 'block';
-            // Set required attributes for company form
             formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.setAttribute('required', ''));
             formPencariKerja.querySelectorAll('input').forEach(input => input.removeAttribute('required'));
           }
         });
       });
 
-      // Initialize form display based on active tab
       if (opsiMasukItems[0].classList.contains('aktif')) {
         formPencariKerja.style.display = 'block';
         formPerusahaan.style.display = 'none';
@@ -251,9 +247,8 @@
         formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('required'));
       }
 
-      // Handle form submission for registration
       registerForm.addEventListener('submit', async function(event) {
-        event.preventDefault(); // Mencegah form submit default
+        event.preventDefault();
 
         let formData = {};
         let apiUrl = '';
@@ -265,8 +260,8 @@
             password: document.getElementById('reg-js-password').value,
             konfirmasiPassword: document.getElementById('reg-js-konfirmasiPassword').value
           };
-          apiUrl = 'http://localhost:3000/api/register/pencari_kerja'; // URL API untuk pencari kerja
-        } else { // currentFormType === 'perusahaan'
+          apiUrl = 'http://localhost:3000/api/register/pencari_kerja';
+        } else {
           formData = {
             namaPerusahaan: document.getElementById('reg-comp-namaPerusahaan').value,
             emailPerusahaan: document.getElementById('reg-comp-emailPerusahaan').value,
@@ -275,7 +270,7 @@
             industri: document.getElementById('reg-comp-industri').value,
             alamat: document.getElementById('reg-comp-alamat').value
           };
-          apiUrl = 'http://localhost:3000/api/register/perusahaan'; // URL API untuk perusahaan
+          apiUrl = 'http://localhost:3000/api/register/perusahaan';
         }
 
         if (formData.password !== formData.konfirmasiPassword) {
@@ -294,10 +289,10 @@
 
           const data = await response.json();
 
-          if (response.ok) { // Jika registrasi berhasil (status 2xx)
+          if (response.ok) {
             alert(data.message);
-            window.location.href = 'login.html'; // Redirect ke halaman login setelah daftar
-          } else { // Jika registrasi gagal (status 4xx, 5xx)
+            window.location.href = 'login.html';
+          } else {
             alert('Registrasi gagal: ' + (data.message || 'Terjadi kesalahan.'));
           }
         } catch (error) {

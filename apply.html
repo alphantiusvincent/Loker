@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lamar Pekerjaan - Senior Frontend Developer | bawaMap</title>
+  <title>Lamar Pekerjaan | BawaMap</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="icon" href="Image/logo-BM.png" type="image/x-icon">
 </head>
@@ -30,9 +30,13 @@
           <li><a href="#">Tentang Kami</a></li>
         </ul>
       </nav>
-      <div class="otentikasi-navigasi">
+      <div class="otentikasi-navigasi" id="auth-buttons">
         <a href="login.html"><button class="tombol-masuk">Masuk</button></a>
-        <button class="tombol-daftar">Daftar</button>
+        <a href="register.html"><button class="tombol-daftar">Daftar</button></a>
+      </div>
+      <div class="selamat-datang-user" style="display: none;">
+        <span id="welcome-message"></span>
+        <button class="tombol-logout" id="logout-button">Logout</button>
       </div>
     </div>
   </header>
@@ -40,7 +44,7 @@
   <main>
     <div class="container">
       <div class="tautan-kembali">
-        <a href="detail.html?id=1">
+        <a href="javascript:history.back()">
           <img src="Image/back.png" alt="Panah Kiri" class="ikon-kecil">
           <span>Kembali ke Detail Lowongan</span>
         </a>
@@ -48,44 +52,8 @@
 
       <div class="container-aplikasi">
         <div class="sidebar-aplikasi">
-          <div class="kartu-ringkasan-kerja">
-            <div class="header-ringkasan-kerja">
-              <div class="logo-perusahaan">
-                <img src="Image/logo-3.png" alt="Logo PT Teknologi Maju">
-              </div>
-              
-              <div class="judul-ringkasan-kerja">
-                <h3>Senior Frontend Developer</h3>
-                <p class="nama-perusahaan">PT Teknologi Maju</p>
-                
-                <div class="lokasi-kerja">
-                  <img src="Image/logo-6.jpeg" alt="Lokasi" class="ikon-kecil">
-                  <span>Jakarta Selatan, DKI Jakarta</span>
-                </div>
-              </div>
-            </div>
-            
-            <div class="detail-ringkasan-kerja">
-              <div class="item-ringkasan">
-                <div class="label-ringkasan">Kategori</div>
-                <div class="nilai-ringkasan">IT</div>
-              </div>
-              
-              <div class="item-ringkasan">
-                <div class="label-ringkasan">Jenis</div>
-                <div class="nilai-ringkasan">Full-time</div>
-              </div>
-              
-              <div class="item-ringkasan">
-                <div class="label-ringkasan">Gaji</div>
-                <div class="nilai-ringkasan">Rp15-25 juta/bulan</div>
-              </div>
-              
-              <div class="item-ringkasan">
-                <div class="label-ringkasan">Deadline</div>
-                <div class="nilai-ringkasan">30 Juni 2025</div>
-              </div>
-            </div>
+          <div class="kartu-ringkasan-kerja" id="job-summary-card">
+            <p style="text-align: center; padding: 20px;">Memuat ringkasan lowongan...</p>
           </div>
         </div>
 
@@ -96,7 +64,10 @@
               <p>Lengkapi data diri Anda untuk melamar posisi ini</p>
             </div>
             
-            <form class="formulir-aplikasi">
+            <form class="formulir-aplikasi" id="applicationForm">
+              <input type="hidden" id="lowonganId" name="lowonganId">
+              <input type="hidden" id="pencariId" name="pencariId">
+
               <div class="bagian-formulir">
                 <h3>Informasi Pribadi</h3>
                 
@@ -137,33 +108,27 @@
                 <h3>Dokumen</h3>
                 
                 <div class="grup-formulir">
-                  <label for="cv">
-                    CV (PDF) <span class="wajib">*</span>
+                  <label for="cv-input"> CV (PDF) <span class="wajib">*</span>
                   </label>
                   <div class="container-input-berkas">
-                    <label for="cv" class="label-input-berkas">
-                      <img src="Image/unggah.png" alt="Unggah" class="ikon-kecil">
+                    <label for="cv-input" class="label-input-berkas"> <img src="Image/unggah.png" alt="Unggah" class="ikon-kecil">
                       <span>Pilih File</span>
                     </label>
-                    <input type="file" id="cv" name="cv" accept=".pdf" required>
-                    <span class="nama-berkas">Belum ada file dipilih</span>
+                    <input type="file" id="cv-input" name="cv" accept=".pdf" required> <span class="nama-berkas" id="namaFileCv">Belum ada file dipilih</span>
                   </div>
-                  <p class="petunjuk-bidang">Format PDF, maksimal 5MB</p>
+                  <p class="petunjuk-bidang">Format PDF, maksimal 5MB (untuk demo hanya nama file)</p>
                 </div>
                 
                 <div class="grup-formulir">
-                  <label for="portofolio">
-                    Portofolio (PDF, opsional)
+                  <label for="portofolio-input"> Portofolio (PDF, opsional)
                   </label>
                   <div class="container-input-berkas">
-                    <label for="portofolio" class="label-input-berkas">
-                      <img src="Image/unggah.png" alt="Unggah" class="ikon-kecil">
+                    <label for="portofolio-input" class="label-input-berkas"> <img src="Image/unggah.png" alt="Unggah" class="ikon-kecil">
                       <span>Pilih File</span>
                     </label>
-                    <input type="file" id="portofolio" name="portofolio" accept=".pdf">
-                    <span class="nama-berkas">Belum ada file dipilih</span>
+                    <input type="file" id="portofolio-input" name="portofolio" accept=".pdf"> <span class="nama-berkas" id="namaFilePortofolio">Belum ada file dipilih</span>
                   </div>
-                  <p class="petunjuk-bidang">Format PDF, maksimal 5MB</p>
+                  <p class="petunjuk-bidang">Format PDF, maksimal 5MB (untuk demo hanya nama file)</p>
                 </div>
               </div>
               
@@ -275,5 +240,209 @@
       </div>
     </div>
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async function() {
+      // Logic untuk tampilan tombol Masuk/Daftar atau Selamat Datang (sama seperti di index.html)
+      const authButtonsContainer = document.getElementById('auth-buttons');
+      const welcomeUserContainer = document.querySelector('.selamat-datang-user');
+      const welcomeMessageSpan = document.getElementById('welcome-message');
+      const logoutButton = document.getElementById('logout-button');
+
+      function checkLoginStatus() {
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        const username = localStorage.getItem('username');
+
+        if (isLoggedIn === 'true' && username) {
+          if (authButtonsContainer) {
+            authButtonsContainer.style.display = 'none';
+          }
+          if (welcomeUserContainer) {
+            welcomeUserContainer.style.display = 'flex';
+          }
+          if (welcomeMessageSpan) {
+            welcomeMessageSpan.innerHTML = `👋 Selamat Datang Kembali, <b>${username}</b>!`;
+          }
+        } else {
+          if (authButtonsContainer) {
+            authButtonsContainer.style.display = 'flex'; 
+          }
+          if (welcomeUserContainer) {
+            welcomeUserContainer.style.display = 'none';
+          }
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userType');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('profileId');
+        window.location.href = 'login.html';
+      }
+
+      if (logoutButton) {
+        logoutButton.addEventListener('click', logout);
+      }
+      checkLoginStatus();
+
+      const applicationForm = document.getElementById('applicationForm');
+      const lowonganIdInput = document.getElementById('lowonganId');
+      const pencariIdInput = document.getElementById('pencariId');
+      const namaFileCvSpan = document.getElementById('namaFileCv');
+      const namaFilePortofolioSpan = document.getElementById('namaFilePortofolio');
+      const cvInput = document.getElementById('cv-input'); 
+      const portofolioInput = document.getElementById('portofolio-input');
+      const jobSummaryCard = document.getElementById('job-summary-card');
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const lowonganId = urlParams.get('id');
+      if (lowonganId) {
+        lowonganIdInput.value = lowonganId;
+      } else {
+        alert('ID Lowongan tidak ditemukan. Anda tidak dapat melamar pekerjaan ini.');
+        window.location.href = 'index.html'; 
+        return; 
+      }
+
+      const loggedInUserType = localStorage.getItem('userType');
+      const loggedInProfileId = localStorage.getItem('profileId'); 
+
+      if (loggedInProfileId && loggedInUserType === 'pencari_kerja') {
+          pencariIdInput.value = loggedInProfileId;
+      } else {
+          alert('Anda harus login sebagai PENCARI KERJA untuk melamar pekerjaan. Mohon login ulang.');
+          window.location.href = 'login.html';
+          return;
+      }
+      
+      cvInput.addEventListener('change', function() {
+          if (this.files && this.files.length > 0) {
+              namaFileCvSpan.textContent = this.files[0].name;
+          } else {
+              namaFileCvSpan.textContent = 'Belum ada file dipilih';
+          }
+      });
+
+      portofolioInput.addEventListener('change', function() {
+          if (this.files && this.files.length > 0) {
+              namaFilePortofolioSpan.textContent = this.files[0].name;
+          } else {
+              namaFilePortofolioSpan.textContent = 'Belum ada file dipilih';
+          }
+      });
+
+      async function loadJobSummary(jobId) {
+          try {
+              const response = await fetch(`http://localhost:3000/api/lowongan/${jobId}`);
+              
+              if (!response.ok) {
+                  throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              const job = await response.json();
+
+              if (!job) {
+                  jobSummaryCard.innerHTML = '<p style="text-align: center; padding: 20px;">Ringkasan lowongan tidak ditemukan.</p>';
+                  return;
+              }
+
+              const logoSrc = job.logo ? `Image/${job.logo}` : 'Image/default-logo.png';
+              const kategoriClass = job.nama_kategori ? `kategori-pekerjaan-${job.nama_kategori.toLowerCase().replace(/ & /g, '_').replace(/ /g, '')}` : 'kategori-pekerjaan-umum';
+              const jenisClass = job.jenis_pekerjaan ? `jenis-pekerjaan-${job.jenis_pekerjaan.toLowerCase()}` : 'jenis-pekerjaan-umum';
+
+              jobSummaryCard.innerHTML = `
+                <div class="header-ringkasan-kerja">
+                  <div class="logo-perusahaan">
+                    <img src="${logoSrc}" alt="Logo ${job.nama_perusahaan}">
+                  </div>
+                  
+                  <div class="judul-ringkasan-kerja">
+                    <h3>${job.judul}</h3>
+                    <p class="nama-perusahaan">${job.nama_perusahaan}</p>
+                    
+                    <div class="lokasi-kerja">
+                      <img src="Image/logo-6.jpeg" alt="Lokasi" class="ikon-kecil">
+                      <span>${job.lokasi_kota}, ${job.lokasi_provinsi}</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="detail-ringkasan-kerja">
+                  <div class="item-ringkasan">
+                    <div class="label-ringkasan">Kategori</div>
+                    <div class="nilai-ringkasan">${job.nama_kategori}</div>
+                  </div>
+                  
+                  <div class="item-ringkasan">
+                    <div class="label-ringkasan">Jenis</div>
+                    <div class="nilai-ringkasan">${job.jenis_pekerjaan}</div>
+                  </div>
+                  
+                  <div class="item-ringkasan">
+                    <div class="label-ringkasan">Gaji</div>
+                    <div class="nilai-ringkasan">Rp${(job.gaji_min || 0).toLocaleString()} - ${(job.gaji_max || 0).toLocaleString()}/bulan</div>
+                  </div>
+                  
+                  <div class="item-ringkasan">
+                    <div class="label-ringkasan">Deadline</div>
+                    <div class="nilai-ringkasan">${new Date(job.tanggal_deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
+                  </div>
+                </div>
+              `;
+          } catch (error) {
+              console.error('Error memuat ringkasan lowongan:', error);
+              jobSummaryCard.innerHTML = '<p style="text-align: center; padding: 20px;">Gagal memuat ringkasan lowongan. Pastikan backend berjalan.</p>';
+          }
+      }
+
+      if (lowonganId) {
+        loadJobSummary(lowonganId);
+      }
+
+      applicationForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+
+        if (!pencariIdInput.value) {
+            alert('ID pencari kerja tidak ditemukan. Pastikan Anda sudah login sebagai pencari kerja.');
+            return;
+        }
+
+        const formData = {
+          lowongan_id: lowonganIdInput.value,
+          pencari_id: pencariIdInput.value,
+          nama_lengkap: document.getElementById('namaLengkap').value,
+          tanggal_lahir: document.getElementById('tanggalLahir').value,
+          email: document.getElementById('surel').value,
+          nomor_hp: document.getElementById('telepon').value,
+          cv: cvInput.files.length > 0 ? cvInput.files[0].name : '', 
+          portofolio: portofolioInput.files.length > 0 ? portofolioInput.files[0].name : '',
+          surat_lamaran: document.getElementById('suratLamaran').value
+        };
+
+        try {
+          const response = await fetch('http://localhost:3000/api/lamar', { 
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+
+          const data = await response.json();
+
+          if (response.ok) {
+            alert(data.message);
+            window.location.href = 'index.html';
+          } else {
+            alert('Gagal mengirim lamaran: ' + (data.message || 'Terjadi kesalahan server.'));
+          }
+        } catch (error) {
+          console.error('Error saat mengirim lamaran:', error);
+          alert('Terjadi kesalahan koneksi. Pastikan backend berjalan di http://localhost:3000.');
+        }
+      });
+    });
+  </script>
 </body>
 </html>

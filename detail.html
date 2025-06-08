@@ -42,8 +42,7 @@
   <main>
     <div class="container">
       <div class="tautan-kembali">
-        <a href="index.html">
-          <img src="Image/back.png" alt="Panah Kiri" class="ikon-kecil">
+        <a href="javascript:history.back()"> <img src="Image/back.png" alt="Panah Kiri" class="ikon-kecil">
           <span>Kembali ke Daftar Lowongan</span>
         </a>
       </div>
@@ -184,6 +183,7 @@
         localStorage.removeItem('username');
         localStorage.removeItem('userType');
         localStorage.removeItem('userId');
+        localStorage.removeItem('profileId');
         window.location.href = 'login.html'; // Redirect to login page
       }
 
@@ -204,7 +204,6 @@
           }
 
           try {
-              // Ganti URL ini dengan URL API backend Anda untuk detail lowongan
               const response = await fetch(`http://localhost:3000/api/lowongan/${jobId}`); 
               
               if (!response.ok) {
@@ -339,7 +338,7 @@
 
       // Initial calls
       checkLoginStatus();
-      loadJobDetail(); // Load job detail when page loads
+      loadJobDetail();
     });
   </script>
 </body>
