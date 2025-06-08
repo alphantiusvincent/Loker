@@ -29,9 +29,13 @@
           <li><a href="#">Tentang Kami</a></li>
         </ul>
       </nav>
-      <div class="otentikasi-navigasi">
+      <div class="otentikasi-navigasi" id="auth-buttons">
         <a href="login.html"><button class="tombol-masuk">Masuk</button></a>
         <a href="register.html"><button class="tombol-daftar">Daftar</button></a>
+      </div>
+      <div class="selamat-datang-user" style="display: none;">
+        <span id="welcome-message"></span>
+        <button class="tombol-logout" id="logout-button">Logout</button>
       </div>
     </div>
   </header>
@@ -44,7 +48,7 @@
           <p>Pilih jenis akun yang ingin Anda daftarkan</p>
         </div>
         
-        <form class="formulir-aplikasi">
+        <form class="formulir-aplikasi" id="registerForm">
           <div class="opsi-masuk" style="margin-bottom: 20px;">
             <button type="button" class="opsi-masuk-item aktif" data-target="pencari-kerja">Pencari Kerja</button>
             <button type="button" class="opsi-masuk-item" data-target="perusahaan">Perusahaan</button>
@@ -166,17 +170,64 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Logic untuk tampilan tombol Masuk/Daftar atau Selamat Datang (sama seperti di index.html)
+      const authButtonsContainer = document.getElementById('auth-buttons');
+      const welcomeUserContainer = document.querySelector('.selamat-datang-user');
+      const welcomeMessageSpan = document.getElementById('welcome-message');
+      const logoutButton = document.getElementById('logout-button');
+
+      function checkLoginStatus() {
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        const username = localStorage.getItem('username');
+
+        if (isLoggedIn === 'true' && username) {
+          if (authButtonsContainer) {
+            authButtonsContainer.style.display = 'none';
+          }
+          if (welcomeUserContainer) {
+            welcomeUserContainer.style.display = 'flex';
+          }
+          if (welcomeMessageSpan) {
+            welcomeMessageSpan.innerHTML = `👋 Selamat Datang Kembali, <b>${username}</b>!`;
+          }
+        } else {
+          if (authButtonsContainer) {
+            authButtonsContainer.style.display = 'flex'; 
+          }
+          if (welcomeUserContainer) {
+            welcomeUserContainer.style.display = 'none';
+          }
+        }
+      }
+
+      function logout() {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userType');
+        localStorage.removeItem('userId');
+        window.location.href = 'login.html';
+      }
+
+      if (logoutButton) {
+        logoutButton.addEventListener('click', logout);
+      }
+      checkLoginStatus();
+
+      // Logic untuk form register (pilih pencari kerja/perusahaan)
       const opsiMasukItems = document.querySelectorAll('.opsi-masuk-item');
       const formPencariKerja = document.getElementById('form-pencari-kerja');
       const formPerusahaan = document.getElementById('form-perusahaan');
+      const registerForm = document.getElementById('registerForm');
+
+      let currentFormType = 'pencari-kerja'; // Default form
 
       opsiMasukItems.forEach(item => {
         item.addEventListener('click', function() {
           opsiMasukItems.forEach(btn => btn.classList.remove('aktif'));
           this.classList.add('aktif');
 
-          const targetForm = this.getAttribute('data-target');
-          if (targetForm === 'pencari-kerja') {
+          currentFormType = this.getAttribute('data-target');
+          if (currentFormType === 'pencari-kerja') {
             formPencariKerja.style.display = 'block';
             formPerusahaan.style.display = 'none';
             // Set required attributes for job seeker form
@@ -199,6 +250,61 @@
         formPencariKerja.querySelectorAll('input').forEach(input => input.setAttribute('required', ''));
         formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('required'));
       }
+
+      // Handle form submission for registration
+      registerForm.addEventListener('submit', async function(event) {
+        event.preventDefault(); // Mencegah form submit default
+
+        let formData = {};
+        let apiUrl = '';
+
+        if (currentFormType === 'pencari-kerja') {
+          formData = {
+            namaLengkap: document.getElementById('reg-js-namaLengkap').value,
+            email: document.getElementById('reg-js-email').value,
+            password: document.getElementById('reg-js-password').value,
+            konfirmasiPassword: document.getElementById('reg-js-konfirmasiPassword').value
+          };
+          apiUrl = 'http://localhost:3000/api/register/pencari_kerja'; // URL API untuk pencari kerja
+        } else { // currentFormType === 'perusahaan'
+          formData = {
+            namaPerusahaan: document.getElementById('reg-comp-namaPerusahaan').value,
+            emailPerusahaan: document.getElementById('reg-comp-emailPerusahaan').value,
+            password: document.getElementById('reg-comp-password').value,
+            konfirmasiPassword: document.getElementById('reg-comp-konfirmasiPassword').value,
+            industri: document.getElementById('reg-comp-industri').value,
+            alamat: document.getElementById('reg-comp-alamat').value
+          };
+          apiUrl = 'http://localhost:3000/api/register/perusahaan'; // URL API untuk perusahaan
+        }
+
+        if (formData.password !== formData.konfirmasiPassword) {
+          alert('Konfirmasi password tidak cocok!');
+          return;
+        }
+
+        try {
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+
+          const data = await response.json();
+
+          if (response.ok) { // Jika registrasi berhasil (status 2xx)
+            alert(data.message);
+            window.location.href = 'login.html'; // Redirect ke halaman login setelah daftar
+          } else { // Jika registrasi gagal (status 4xx, 5xx)
+            alert('Registrasi gagal: ' + (data.message || 'Terjadi kesalahan.'));
+          }
+        } catch (error) {
+          console.error('Error saat registrasi:', error);
+          alert('Terjadi kesalahan koneksi. Pastikan backend berjalan di http://localhost:3000.');
+        }
+      });
     });
   </script>
 </body>

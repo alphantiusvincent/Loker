@@ -37,17 +37,47 @@
 </div>
 
 <script>
-    document.getElementById('loginForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const usernameInput = document.getElementById('js-username');
-        const username = usernameInput.value;
-
-        // Simulasi login berhasil
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('username', username);
+    document.addEventListener('DOMContentLoaded', function() {
+        const loginForm = document.getElementById('loginForm');
         
-        window.location.href = 'index.html';
+        loginForm.addEventListener('submit', async function(event) {
+            event.preventDefault(); // Mencegah form dari submit default
+
+            const usernameInput = document.getElementById('js-username');
+            const passwordInput = document.getElementById('js-password');
+            const username = usernameInput.value;
+            const password = passwordInput.value;
+
+            try {
+                // KIRIM DATA LOGIN KE BACKEND
+                // URL ini harus sesuai dengan URL backend Anda (misal: http://localhost:3000/api/login)
+                const response = await fetch('http://localhost:3000/api/login', { 
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) { // Jika respons 2xx (sukses) dari backend
+                    alert(data.message); // Tampilkan pesan sukses dari backend
+                    localStorage.setItem('isLoggedIn', 'true');
+                    localStorage.setItem('username', data.username); // Ambil username dari respons backend
+                    localStorage.setItem('userType', data.userType || 'pencari_kerja'); // Simpan tipe user
+                    localStorage.setItem('userId', data.userId || '1'); // Simpan ID user (contoh default jika tidak ada)
+
+                    window.location.href = 'index.html'; // Redirect ke halaman utama
+                } else {
+                    // Jika respons 4xx atau 5xx (gagal) dari backend
+                    alert('Login gagal: ' + (data.message || 'Terjadi kesalahan.')); 
+                }
+            } catch (error) {
+                console.error('Error saat melakukan fetch:', error);
+                alert('Terjadi kesalahan saat mencoba login. Pastikan backend berjalan di http://localhost:3000.');
+            }
+        });
     });
 </script>
 
