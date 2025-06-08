@@ -1,3 +1,133 @@
+<?php
+require_once "koneksi.php";
+session_start();
+
+$message = ''; // Untuk pesan sukses/gagal registrasi
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $current_form_type = $_POST['currentFormType'] ?? 'pencari-kerja'; // Hidden input dari JS
+    
+    if ($current_form_type === 'pencari-kerja') {
+        $nama_lengkap = $_POST['namaLengkap'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $konfirmasiPassword = $_POST['konfirmasiPassword'] ?? '';
+
+        if (empty($nama_lengkap) || empty($email) || empty($password) || $password !== $konfirmasiPassword) {
+            $message = "error|Data pencari kerja tidak lengkap atau password tidak cocok.";
+        } else {
+            // PENTING: Dalam aplikasi nyata, password HARUS di-hash (misalnya dengan password_hash())
+            // Untuk demo, kita simpan plain text.
+            // $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+            // Periksa apakah email atau username sudah ada
+            $check_user_query = "SELECT COUNT(*) FROM users WHERE email = ? OR username = ?";
+            $stmt_check = mysqli_prepare($conn, $check_user_query);
+            $username = explode('@', $email)[0];
+            mysqli_stmt_bind_param($stmt_check, "ss", $email, $username);
+            mysqli_stmt_execute($stmt_check);
+            mysqli_stmt_bind_result($stmt_check, $count);
+            mysqli_stmt_fetch($stmt_check);
+            mysqli_stmt_close($stmt_check);
+
+            if ($count > 0) {
+                $message = "error|Email atau username sudah terdaftar.";
+            } else {
+                // Mulai transaksi
+                mysqli_begin_transaction($conn);
+                try {
+                    // Masukkan ke tabel users
+                    $insert_user_query = "INSERT INTO users (username, email, password, user_type) VALUES (?, ?, ?, 'pencari_kerja')";
+                    $stmt_user = mysqli_prepare($conn, $insert_user_query);
+                    mysqli_stmt_bind_param($stmt_user, "sss", $username, $email, $password);
+                    mysqli_stmt_execute($stmt_user);
+                    $newUserId = mysqli_insert_id($conn);
+                    mysqli_stmt_close($stmt_user);
+
+                    // Masukkan ke tabel pencari_kerja
+                    $insert_pencari_query = "INSERT INTO pencari_kerja (user_id, nama_lengkap) VALUES (?, ?)";
+                    $stmt_pencari = mysqli_prepare($conn, $insert_pencari_query);
+                    mysqli_stmt_bind_param($stmt_pencari, "is", $newUserId, $nama_lengkap);
+                    mysqli_stmt_execute($stmt_pencari);
+                    mysqli_stmt_close($stmt_pencari);
+
+                    mysqli_commit($conn);
+                    $message = "success|Registrasi pencari kerja berhasil! Silakan login.";
+                    header("Location: login.php?message=" . urlencode($message));
+                    exit();
+                } catch (Exception $e) {
+                    mysqli_rollback($conn);
+                    $message = "error|Terjadi kesalahan saat registrasi: " . $e->getMessage();
+                    error_log("Registrasi Pencari Kerja Error: " . $e->getMessage());
+                }
+            }
+        }
+    } elseif ($current_form_type === 'perusahaan') {
+        $nama_perusahaan = $_POST['namaPerusahaan'] ?? '';
+        $email_perusahaan = $_POST['emailPerusahaan'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $konfirmasiPassword = $_POST['konfirmasiPassword'] ?? '';
+        $industri = $_POST['industri'] ?? '';
+        $alamat = $_POST['alamat'] ?? '';
+
+        if (empty($nama_perusahaan) || empty($email_perusahaan) || empty($password) || $password !== $konfirmasiPassword) {
+            $message = "error|Data perusahaan tidak lengkap atau password tidak cocok.";
+        } else {
+            // PENTING: Dalam aplikasi nyata, password HARUS di-hash!
+            // $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+
+            // Periksa apakah email atau username sudah ada
+            $check_user_query = "SELECT COUNT(*) FROM users WHERE email = ? OR username = ?";
+            $stmt_check = mysqli_prepare($conn, $check_user_query);
+            $username = explode('@', $email_perusahaan)[0];
+            mysqli_stmt_bind_param($stmt_check, "ss", $email_perusahaan, $username);
+            mysqli_stmt_execute($stmt_check);
+            mysqli_stmt_bind_result($stmt_check, $count);
+            mysqli_stmt_fetch($stmt_check);
+            mysqli_stmt_close($stmt_check);
+
+            if ($count > 0) {
+                $message = "error|Email atau username sudah terdaftar.";
+            } else {
+                // Mulai transaksi
+                mysqli_begin_transaction($conn);
+                try {
+                    // Masukkan ke tabel users
+                    $insert_user_query = "INSERT INTO users (username, email, password, user_type) VALUES (?, ?, ?, 'perusahaan')";
+                    $stmt_user = mysqli_prepare($conn, $insert_user_query);
+                    mysqli_stmt_bind_param($stmt_user, "sss", $username, $email_perusahaan, $password);
+                    mysqli_stmt_execute($stmt_user);
+                    $newUserId = mysqli_insert_id($conn);
+                    mysqli_stmt_close($stmt_user);
+
+                    // Masukkan ke tabel perusahaan
+                    $insert_perusahaan_query = "INSERT INTO perusahaan (user_id, nama_perusahaan, industri, alamat) VALUES (?, ?, ?, ?)";
+                    $stmt_perusahaan = mysqli_prepare($conn, $insert_perusahaan_query);
+                    mysqli_stmt_bind_param($stmt_perusahaan, "isss", $newUserId, $nama_perusahaan, $industri, $alamat);
+                    mysqli_stmt_execute($stmt_perusahaan);
+                    mysqli_stmt_close($stmt_perusahaan);
+
+                    mysqli_commit($conn);
+                    $message = "success|Registrasi perusahaan berhasil! Silakan login.";
+                    header("Location: login.php?message=" . urlencode($message));
+                    exit();
+                } catch (Exception $e) {
+                    mysqli_rollback($conn);
+                    $message = "error|Terjadi kesalahan saat registrasi: " . $e->getMessage();
+                    error_log("Registrasi Perusahaan Error: " . $e->getMessage());
+                }
+            }
+        }
+    }
+}
+
+// Pesan feedback (sukses/gagal)
+$feedback_message = '';
+if (!empty($message)) {
+    list($type, $text) = explode('|', $message, 2);
+    $feedback_message = "<script>alert('" . htmlspecialchars($text) . "');</script>";
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +138,7 @@
   <link rel="icon" href="Image/logo-BM.png" type="image/x-icon">
 </head>
 <body>
-
+  <?= $feedback_message ?>
   <header class="navigasi">
     <div class="container">
       <div class="merek-navigasi">
@@ -16,22 +146,22 @@
           <div class="logo-perusahaan1">
             <img src="Image/logo-BM.png" alt="logo-BM">
           </div>
-          <a href="index.html">
+          <a href="index.php">
             <h1>BawaMap</h1>
           </a>
         </div>
       </div>
       <nav class="menu-navigasi">
         <ul>
-          <li><a href="index.html">Beranda</a></li>
+          <li><a href="index.php">Beranda</a></li>
           <li><a href="#">Kategori</a></li>
           <li><a href="#">Perusahaan</a></li>
           <li><a href="#">Tentang Kami</a></li>
         </ul>
       </nav>
       <div class="otentikasi-navigasi" id="auth-buttons">
-        <a href="login.html"><button class="tombol-masuk">Masuk</button></a>
-        <a href="register.html"><button class="tombol-daftar">Daftar</button></a>
+        <a href="login.php"><button class="tombol-masuk">Masuk</button></a>
+        <a href="register.php"><button class="tombol-daftar">Daftar</button></a>
       </div>
       <div class="selamat-datang-user" style="display: none;">
         <span id="welcome-message"></span>
@@ -48,7 +178,9 @@
           <p>Pilih jenis akun yang ingin Anda daftarkan</p>
         </div>
         
-        <form class="formulir-aplikasi" id="registerForm">
+        <form class="formulir-aplikasi" id="registerForm" method="POST" action="register.php">
+          <input type="hidden" id="currentFormType" name="currentFormType" value="pencari-kerja">
+
           <div class="opsi-masuk" style="margin-bottom: 20px;">
             <button type="button" class="opsi-masuk-item aktif" data-target="pencari-kerja">Pencari Kerja</button>
             <button type="button" class="opsi-masuk-item" data-target="perusahaan">Perusahaan</button>
@@ -117,7 +249,7 @@
             <button type="submit" class="tombol-kirim">Daftar Sekarang</button>
           </div>
           <div class="footer-formulir" style="margin-top: 15px;">
-            <p>Sudah punya akun? <a href="login.html">Masuk di sini</a></p>
+            <p>Sudah punya akun? <a href="login.php">Masuk di sini</a></p>
           </div>
         </form>
       </div>
@@ -135,7 +267,7 @@
           <div class="kolom-footer">
             <h4>Menu</h4>
             <ul>
-              <li><a href="index.html">Beranda</a></li>
+              <li><a href="index.php">Beranda</a></li>
               <li><a href="#">Lowongan</a></li>
               <li><a href="#">Perusahaan</a></li>
               <li><a href="#">Tips Karir</a></li>
@@ -170,12 +302,16 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Logic untuk tampilan tombol Masuk/Daftar atau Selamat Datang (sama seperti di index.php)
       const authButtonsContainer = document.getElementById('auth-buttons');
       const welcomeUserContainer = document.querySelector('.selamat-datang-user');
       const welcomeMessageSpan = document.getElementById('welcome-message');
       const logoutButton = document.getElementById('logout-button');
 
       function checkLoginStatus() {
+        // Pada halaman PHP, status login sebenarnya dikelola oleh sesi PHP.
+        // JavaScript di sini hanya untuk tampilan awal.
+        // Untuk demo ini, kita masih mengambil dari localStorage untuk tampilan.
         const isLoggedIn = localStorage.getItem('isLoggedIn');
         const username = localStorage.getItem('username');
 
@@ -200,12 +336,8 @@
       }
 
       function logout() {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('username');
-        localStorage.removeItem('userType');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('profileId');
-        window.location.href = 'login.html';
+        // Saat tombol logout ditekan, kita akan memanggil skrip PHP untuk menghancurkan sesi.
+        window.location.href = 'logout_process.php'; // Redirect ke logout_process.php
       }
 
       if (logoutButton) {
@@ -217,8 +349,9 @@
       const formPencariKerja = document.getElementById('form-pencari-kerja');
       const formPerusahaan = document.getElementById('form-perusahaan');
       const registerForm = document.getElementById('registerForm');
+      const currentFormTypeHidden = document.getElementById('currentFormType'); // Hidden input untuk jenis form
 
-      let currentFormType = 'pencari-kerja';
+      let currentFormType = 'pencari-kerja'; // Default form
 
       opsiMasukItems.forEach(item => {
         item.addEventListener('click', function() {
@@ -226,80 +359,39 @@
           this.classList.add('aktif');
 
           currentFormType = this.getAttribute('data-target');
+          currentFormTypeHidden.value = currentFormType; // Update hidden input value
+
           if (currentFormType === 'pencari-kerja') {
             formPencariKerja.style.display = 'block';
             formPerusahaan.style.display = 'none';
+            // Set required attributes for job seeker form
             formPencariKerja.querySelectorAll('input').forEach(input => input.setAttribute('required', ''));
             formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('required'));
           } else {
             formPencariKerja.style.display = 'none';
             formPerusahaan.style.display = 'block';
+            // Set required attributes for company form
             formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.setAttribute('required', ''));
             formPencariKerja.querySelectorAll('input').forEach(input => input.removeAttribute('required'));
           }
         });
       });
 
-      if (opsiMasukItems[0].classList.contains('aktif')) {
+      // Initialize form display based on active tab
+      if (currentFormTypeHidden.value === 'pencari-kerja') { // Gunakan nilai dari hidden input untuk init
         formPencariKerja.style.display = 'block';
         formPerusahaan.style.display = 'none';
         formPencariKerja.querySelectorAll('input').forEach(input => input.setAttribute('required', ''));
         formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('required'));
+      } else {
+         formPencariKerja.style.display = 'none';
+         formPerusahaan.style.display = 'block';
+         formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.setAttribute('required', ''));
+         formPencariKerja.querySelectorAll('input').forEach(input => input.removeAttribute('required'));
       }
 
-      registerForm.addEventListener('submit', async function(event) {
-        event.preventDefault();
-
-        let formData = {};
-        let apiUrl = '';
-
-        if (currentFormType === 'pencari-kerja') {
-          formData = {
-            namaLengkap: document.getElementById('reg-js-namaLengkap').value,
-            email: document.getElementById('reg-js-email').value,
-            password: document.getElementById('reg-js-password').value,
-            konfirmasiPassword: document.getElementById('reg-js-konfirmasiPassword').value
-          };
-          apiUrl = 'http://localhost:3000/api/register/pencari_kerja';
-        } else {
-          formData = {
-            namaPerusahaan: document.getElementById('reg-comp-namaPerusahaan').value,
-            emailPerusahaan: document.getElementById('reg-comp-emailPerusahaan').value,
-            password: document.getElementById('reg-comp-password').value,
-            konfirmasiPassword: document.getElementById('reg-comp-konfirmasiPassword').value,
-            industri: document.getElementById('reg-comp-industri').value,
-            alamat: document.getElementById('reg-comp-alamat').value
-          };
-          apiUrl = 'http://localhost:3000/api/register/perusahaan';
-        }
-
-        if (formData.password !== formData.konfirmasiPassword) {
-          alert('Konfirmasi password tidak cocok!');
-          return;
-        }
-
-        try {
-          const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(formData)
-          });
-
-          const data = await response.json();
-
-          if (response.ok) {
-            alert(data.message);
-            window.location.href = 'login.html';
-          } else {
-            alert('Registrasi gagal: ' + (data.message || 'Terjadi kesalahan.'));
-          }
-        } catch (error) {
-          console.error('Error saat registrasi:', error);
-          alert('Terjadi kesalahan koneksi. Pastikan backend berjalan di http://localhost:3000.');
-        }
-      });
+      // Hapus event listener submit JS lama karena form sekarang POST ke PHP
+      // registerForm.removeEventListener('submit', async function(event) { ... });
     });
   </script>
 </body>

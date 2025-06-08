@@ -1,5 +1,35 @@
+<?php
+// Pastikan koneksi.php ada di direktori yang sama
+require_once "koneksi.php"; // Menggunakan require_once untuk menghindari masalah jika dipanggil berkali-kali
+session_start(); // Pastikan session_start() dipanggil paling awal jika ada output lain
+
+// Ambil data lowongan dari database
+// Sesuaikan query dengan skema bawamap.sql yang Anda miliki
+$query = "SELECT 
+            l.lowongan_id AS id, 
+            l.judul, 
+            l.jenis_pekerjaan AS jenis, 
+            l.gaji_min, 
+            l.gaji_max, 
+            l.tanggal_deadline AS deadline,
+            l.lokasi_kota AS lokasi,
+            p.nama_perusahaan AS perusahaan, 
+            p.logo,
+            k.nama_kategori AS kategori
+          FROM lowongan l
+          JOIN perusahaan p ON l.perusahaan_id = p.perusahaan_id
+          JOIN kategori k ON l.kategori_id = k.kategori_id
+          ORDER BY l.tanggal_posting DESC LIMIT 6"; // Mengambil 6 lowongan terbaru
+
+$result = mysqli_query($conn, $query);
+
+// Periksa apakah query berhasil
+if (!$result) {
+    die("Query lowongan gagal: " . mysqli_error($conn));
+}
+?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,24 +44,21 @@
         <div class="kepala-kartu">
           <div class="logo-perusahaan1">
             <img src="Image/logo-BM.png" alt="logo-BM">
-            
           </div>
-          <a href="index.html">
-            <h1>BawaMap</h1>
-        </a>
+          <a href="index.php"><h1>BawaMap</h1></a>
         </div>
       </div>
       <nav class="menu-navigasi">
         <ul>
-          <li><a href="index.html">Beranda</a></li>
+          <li><a href="index.php">Beranda</a></li>
           <li><a href="#">Kategori</a></li>
           <li><a href="#">Perusahaan</a></li>
           <li><a href="#">Tentang Kami</a></li>
         </ul>
       </nav>
       <div class="otentikasi-navigasi" id="auth-buttons">
-        <a href="login.html"><button class="tombol-masuk">Masuk</button></a>
-        <a href="register.html"><button class="tombol-daftar">Daftar</button></a>
+        <a href="login.php"><button class="tombol-masuk">Masuk</button></a>
+        <a href="register.php"><button class="tombol-daftar">Daftar</button></a>
       </div>
       <div class="selamat-datang-user" style="display: none;">
         <span id="welcome-message"></span>
@@ -47,7 +74,6 @@
         <p>Lebih dari 10.000 lowongan pekerjaan dari berbagai industri tersedia untuk Anda</p>
       </section>
 
-      
       <section class="bagian-pencarian">
         <div class="kartu-pencarian">
           <div class="kepala-pencarian">
@@ -116,15 +142,65 @@
         </div>
       </section>
 
-           <section class="bagian-daftar-pekerjaan">
+      <section class="bagian-daftar-pekerjaan">
         <div class="kepala-daftar">
           <h2>Lowongan Pekerjaan Terbaru</h2>
           <p>Daftar lowongan pekerjaan yang baru ditambahkan di platform kami</p>
         </div>
 
-        <div class="daftar-pekerjaan" id="job-listings-container">
-                 </div>
-
+        <div class="daftar-pekerjaan">
+          <?php if (mysqli_num_rows($result) > 0) : ?>
+            <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+              <div class="kartu-pekerjaan">
+                <div class="kepala-kartu">
+                  <div class="logo-perusahaan">
+                    <img src="Image/<?= htmlspecialchars($row['logo'] ?? 'default-logo.png') ?>" alt="Logo <?= htmlspecialchars($row['perusahaan'] ?? 'Perusahaan') ?>">
+                  </div>
+                  <div class="tag-pekerjaan">
+                    <?php 
+                    $kategoriClass = strtolower(str_replace([' ', '&'], ['', '_'], $row['kategori'] ?? ''));
+                    if (empty($kategoriClass)) $kategoriClass = 'umum';
+                    $kategoriClass = 'kategori-pekerjaan-' . $kategoriClass;
+                    ?>
+                    <span class="kategori-pekerjaan <?= $kategoriClass ?>"> <?= htmlspecialchars($row['kategori'] ?? 'Umum') ?> </span>
+                    <?php 
+                    $jenisClass = strtolower($row['jenis'] ?? '');
+                    if (empty($jenisClass)) $jenisClass = 'full-time'; // Default jika jenis kosong
+                    $jenisClass = 'jenis-pekerjaan-' . $jenisClass;
+                    ?>
+                    <span class="jenis-pekerjaan <?= $jenisClass ?>"> <?= htmlspecialchars($row['jenis'] ?? 'Full-time') ?> </span>
+                  </div>
+                </div>
+                <div class="konten-kartu">
+                  <h3 class="judul-pekerjaan">
+                    <a href="detail.php?id=<?= htmlspecialchars($row['id']) ?>"><?= htmlspecialchars($row['judul']) ?></a>
+                  </h3>
+                  <p class="nama-perusahaan"><?= htmlspecialchars($row['perusahaan'] ?? 'Nama Perusahaan Tidak Diketahui') ?></p>
+                  <div class="lokasi-pekerjaan">
+                    <img src="Image/logo-6.jpeg" alt="Lokasi" class="ikon-kecil">
+                    <span><?= htmlspecialchars($row['lokasi'] ?? 'Lokasi Tidak Diketahui') ?></span>
+                  </div>
+                  <div class="footer-kartu">
+                    <?php
+                    $gajiText = '';
+                    if (isset($row['gaji_min']) && isset($row['gaji_max'])) {
+                        $gajiText = 'Rp' . number_format($row['gaji_min'], 0, ',', '.') . ' - ' . number_format($row['gaji_max'], 0, ',', '.') . '/bulan';
+                    } elseif (isset($row['gaji_min'])) {
+                        $gajiText = 'Rp' . number_format($row['gaji_min'], 0, ',', '.') . '+/bulan';
+                    } else {
+                        $gajiText = 'Gaji Negosiasi';
+                    }
+                    ?>
+                    <div class="gaji-pekerjaan"><?= htmlspecialchars($gajiText) ?></div>
+                    <div class="deadline-pekerjaan">Deadline: <?= date("d M Y", strtotime($row['deadline'] ?? '')) ?></div>
+                  </div>
+                </div>
+              </div>
+            <?php endwhile; ?>
+          <?php else : ?>
+            <p style="text-align: center; width: 100%; grid-column: 1 / -1;">Tidak ada lowongan pekerjaan terbaru saat ini.</p>
+          <?php endif; ?>
+        </div>
         <div class="muat-lagi">
           <button class="tombol-muat-lagi">Muat Lebih Banyak</button>
         </div>
@@ -162,7 +238,7 @@
         
         <div class="footer-formulir">
           <a href="#">Lupa password?</a>
-         <p>Belum punya akun? <a href="register.html">Daftar sekarang</a></p>
+          <p>Belum punya akun? <a href="register.php">Daftar sekarang</a></p>
         </div>
       </form>
     </div>
@@ -180,7 +256,7 @@
           <div class="kolom-footer">
             <h4>Menu</h4>
             <ul>
-              <li><a href="index.html">Beranda</a></li>
+              <li><a href="index.php">Beranda</a></li>
               <li><a href="#">Lowongan</a></li>
               <li><a href="#">Perusahaan</a></li>
               <li><a href="#">Tips Karir</a></li>
@@ -217,12 +293,12 @@
   </footer>
 
   <script>
-    document.addEventListener('DOMContentLoaded', async function() {
+    document.addEventListener('DOMContentLoaded', function() {
       const authButtonsContainer = document.getElementById('auth-buttons');
       const welcomeUserContainer = document.querySelector('.selamat-datang-user');
       const welcomeMessageSpan = document.getElementById('welcome-message');
       const logoutButton = document.getElementById('logout-button');
-      const jobListingsContainer = document.getElementById('job-listings-container');
+      // jobListingsContainer dihapus karena data lowongan sekarang dimuat oleh PHP
 
       // Function to check login status (simulated)
       function checkLoginStatus() {
@@ -256,7 +332,7 @@
         localStorage.removeItem('userType');
         localStorage.removeItem('userId');
         localStorage.removeItem('profileId');
-        window.location.href = 'login.html'; // Redirect to login page
+        window.location.href = 'login.php'; // Perbarui link ke login.php
       }
 
       // Add event listener to logout button
@@ -264,65 +340,12 @@
         logoutButton.addEventListener('click', logout);
       }
 
-      // Function to load job listings from backend API
-      async function loadJobs() {
-          try {
-              const response = await fetch('http://localhost:3000/api/lowongan'); 
-              
-              if (!response.ok) {
-                  throw new Error(`HTTP error! status: ${response.status}`);
-              }
-              const jobs = await response.json();
-
-              jobListingsContainer.innerHTML = ''; // Clear previous content
-
-              if (jobs.length === 0) {
-                  jobListingsContainer.innerHTML = '<p style="text-align: center; width: 100%; grid-column: 1 / -1;">Tidak ada lowongan pekerjaan yang tersedia saat ini.</p>';
-                  return;
-              }
-
-              jobs.forEach(job => {
-                  const logoSrc = job.logo ? `Image/${job.logo}` : 'Image/default-logo.png';
-                  const kategoriClass = job.nama_kategori ? `kategori-pekerjaan-${job.nama_kategori.toLowerCase().replace(/ & /g, '_').replace(/ /g, '')}` : 'kategori-pekerjaan-umum';
-                  const jenisClass = job.jenis_pekerjaan ? `jenis-pekerjaan-${job.jenis_pekerjaan.toLowerCase()}` : 'jenis-pekerjaan-umum';
-
-                  const jobCard = `
-                      <div class="kartu-pekerjaan">
-                          <div class="kepala-kartu">
-                              <div class="logo-perusahaan">
-                                  <img src="${logoSrc}" alt="Logo ${job.nama_perusahaan || 'Perusahaan'}">
-                              </div>
-                              <div class="tag-pekerjaan">
-                                  <span class="kategori-pekerjaan ${kategoriClass}">${job.nama_kategori || 'Umum'}</span>
-                                  <span class="jenis-pekerjaan ${jenisClass}">${job.jenis_pekerjaan || 'Full-time'}</span>
-                              </div>
-                          </div>
-                          <div class="konten-kartu">
-                              <h3 class="judul-pekerjaan"><a href="detail.html?id=${job.lowongan_id}">${job.judul}</a></h3>
-                              <p class="nama-perusahaan">${job.nama_perusahaan || 'Nama Perusahaan Tidak Diketahui'}</p>
-                              <div class="lokasi-pekerjaan">
-                                  <img src="Image/logo-6.jpeg" alt="Lokasi" class="ikon-kecil">
-                                  <span>${job.lokasi_kota || 'Lokasi Tidak Diketahui'}, ${job.lokasi_provinsi || ''}</span>
-                              </div>
-                              <div class="footer-kartu">
-                                  <div class="gaji-pekerjaan">Rp${(job.gaji_min || 0).toLocaleString()} - ${(job.gaji_max || 0).toLocaleString()}/bulan</div>
-                                  <div class="deadline-pekerjaan">Deadline: ${new Date(job.tanggal_deadline).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</div>
-                              </div>
-                          </div>
-                      </div>
-                  `;
-                  jobListingsContainer.insertAdjacentHTML('beforeend', jobCard);
-              });
-
-          } catch (error) {
-              console.error('Error memuat lowongan:', error);
-              jobListingsContainer.innerHTML = '<p style="text-align: center; width: 100%; grid-column: 1 / -1;">Gagal memuat lowongan pekerjaan dari server. Pastikan backend berjalan di http://localhost:3000.</p>';
-          }
-      }
-
-      // Initial calls
+      // Initial call for login status
       checkLoginStatus();
-      loadJobs();
+
+      // loadJobs() function (yang memanggil backend Node.js) dihapus dari sini,
+      // karena data lowongan sekarang dimuat langsung oleh PHP di server side.
+      // Filter pencarian dan tombol "Muat Lebih Banyak" akan memerlukan implementasi PHP/AJAX jika ingin berfungsi.
     });
   </script>
 </body>
