@@ -67,7 +67,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $gaji_min = $_POST['gajiMin'] ?? null;
     $gaji_max = $_POST['gajiMax'] ?? null;
     $tanggal_deadline = $_POST['tanggalDeadline'] ?? '';
-    $status_lowongan = $_POST['statusLowongan'] ?? 'aktif'; // Ambil status dari form (jika ada)
+    $status_lowongan = $_POST['statusLowongan'] ?? 'aktif';
 
     // Penanganan Upload Logo Perusahaan (Opsional) - Sama seperti tambah_lowongan.php
     $logo_filename = '';
@@ -75,6 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $file_tmp_name = $_FILES['logo']['tmp_name'];
         $file_name = basename($_FILES['logo']['name']);
         $file_size = $_FILES['logo']['size'];
+        $file_type = $_FILES['logo']['type'];
         $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
 
         $allowed_ext = ['jpg', 'jpeg', 'png', 'gif'];
@@ -115,12 +116,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 judul = ?, deskripsi = ?, kualifikasi = ?, benefit = ?, kategori_id = ?, 
                                 jenis_pekerjaan = ?, lokasi_kota = ?, lokasi_provinsi = ?, 
                                 gaji_min = ?, gaji_max = ?, tanggal_deadline = ?, status = ?
-                             WHERE lowongan_id = ? AND perusahaan_id = ?"; // Penting: perusahaan_id untuk keamanan
+                             WHERE lowongan_id = ? AND perusahaan_id = ?"; 
             $stmt = mysqli_prepare($conn, $update_query);
 
             if ($stmt) {
-                // Tipe parameter: s=string, i=integer. Sesuaikan dengan urutan.
-                mysqli_stmt_bind_param($stmt, "sssssisssiiissii", 
+                // PERBAIKAN DI SINI: Type definition string yang benar untuk 14 parameter
+                // s=judul, s=deskripsi, s=kualifikasi, s=benefit, i=kategori_id, s=jenis_pekerjaan,
+                // s=lokasi_kota, s=lokasi_provinsi, i=gaji_min, i=gaji_max, s=tanggal_deadline, s=status_lowongan,
+                // i=lowongan_id, i=profileId
+                mysqli_stmt_bind_param($stmt, "ssssisssiiisii", // <<< String ini memiliki 14 karakter
                     $judul, 
                     $deskripsi, 
                     $kualifikasi, 
@@ -139,8 +143,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 if (mysqli_stmt_execute($stmt)) {
                     $message = "success|Lowongan berhasil diperbarui!";
-                    // Setelah update, muat ulang data lowongan_data agar form terisi data terbaru
-                    // Atau redirect ke dashboard
                     header("Location: dashboard_perusahaan.php?message=" . urlencode($message));
                     exit();
                 } else {
@@ -156,7 +158,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Pesan feedback (sukses/gagal)
+// Pesan feedback
 $feedback_text_for_alert = '';
 if (!empty($message)) {
     list($type, $text) = explode('|', $message, 2);
