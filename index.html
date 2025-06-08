@@ -29,9 +29,13 @@
           <li><a href="#">Tentang Kami</a></li>
         </ul>
       </nav>
-      <div class="otentikasi-navigasi">
+      <div class="otentikasi-navigasi" id="auth-buttons">
         <a href="login.html"><button class="tombol-masuk">Masuk</button></a>
         <a href="register.html"><button class="tombol-daftar">Daftar</button></a>
+      </div>
+      <div class="selamat-datang-user" style="display: none;">
+        <span id="welcome-message"></span>
+        <button class="tombol-logout" id="logout-button">Logout</button>
       </div>
     </div>
   </header>
@@ -354,5 +358,54 @@
       </div>
     </div>
   </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const authButtonsContainer = document.getElementById('auth-buttons');
+      const welcomeUserContainer = document.querySelector('.selamat-datang-user');
+      const welcomeMessageSpan = document.getElementById('welcome-message');
+      const logoutButton = document.getElementById('logout-button'); // Ambil tombol logout
+
+      // Fungsi untuk mengecek status login (simulasi)
+      function checkLoginStatus() {
+        const isLoggedIn = localStorage.getItem('isLoggedIn');
+        const username = localStorage.getItem('username');
+
+        if (isLoggedIn === 'true' && username) {
+          if (authButtonsContainer) {
+            authButtonsContainer.style.display = 'none';
+          }
+          if (welcomeUserContainer) {
+            welcomeUserContainer.style.display = 'flex'; // Ubah ke flex
+          }
+          if (welcomeMessageSpan) {
+            welcomeMessageSpan.innerHTML = `👋 Selamat Datang Kembali, <b>${username}</b>!`;
+          }
+        } else {
+          if (authButtonsContainer) {
+            authButtonsContainer.style.display = 'flex'; 
+          }
+          if (welcomeUserContainer) {
+            welcomeUserContainer.style.display = 'none';
+          }
+        }
+      }
+
+      // Fungsi untuk logout
+     function logout() {
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('username');
+        // Arahkan kembali ke halaman login
+        window.location.href = 'login.html'; // <<< SUDAH DIUBAH
+      }
+
+      // Tambahkan event listener ke tombol logout
+      if (logoutButton) {
+        logoutButton.addEventListener('click', logout);
+      }
+
+      checkLoginStatus();
+    });
+  </script>
 </body>
 </html>

@@ -17,7 +17,7 @@
     </select>
     
     <div id="jobSeekerForm">
-        <form action="index.html" method="get">
+        <form id="loginForm" action="#" method="get">
             <div class="form-group">
                 <label for="js-username">Username</label>
                 <input type="text" id="js-username" name="username" required>
@@ -35,6 +35,21 @@
         </form>
     </div>
 </div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const usernameInput = document.getElementById('js-username');
+        const username = usernameInput.value;
+
+        // Simulasi login berhasil
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('username', username);
+        
+        window.location.href = 'index.html';
+    });
+</script>
 
 </body>
 </html>
