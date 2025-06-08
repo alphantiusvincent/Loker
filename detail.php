@@ -1,19 +1,22 @@
 <?php
-// Pastikan koneksi.php ada di direktori yang sama
-require_once "koneksi.php"; 
-session_start(); // Memulai sesi PHP
+require_once "koneksi.php";
+session_start();
+
+// Inisialisasi variabel pesan feedback
+$feedback_message = '';
+if (isset($_GET['message'])) { // Ambil pesan dari URL redirect (misal dari apply.php)
+    $feedback_message = "<script>alert('" . htmlspecialchars($_GET['message']) . "');</script>";
+}
 
 // Ambil ID lowongan dari URL
-$lowongan_id = $_GET['id'] ?? null; // Menggunakan operator null coalescing untuk PHP 7+
+$lowongan_id = $_GET['id'] ?? null;
 
 if (!$lowongan_id) {
-    // Redirect atau tampilkan pesan error jika ID lowongan tidak ada
-    header("Location: index.php");
+    header("Location: index.php?error=" . urlencode("ID Lowongan tidak ditemukan."));
     exit();
 }
 
 // Ambil detail lowongan dari database
-// PERBAIKAN: Mengganti 'p.lokasi' dengan 'p.kota' dan 'p.provinsi'
 $query = "SELECT 
             l.lowongan_id AS id, 
             l.judul, 
@@ -37,22 +40,20 @@ $query = "SELECT
           JOIN kategori k ON l.kategori_id = k.kategori_id 
           WHERE l.lowongan_id = ?";
 
-// Menggunakan prepared statement untuk keamanan dan menghindari SQL Injection
 $stmt = mysqli_prepare($conn, $query);
 
 if ($stmt) {
-    mysqli_stmt_bind_param($stmt, "i", $lowongan_id); // "i" berarti integer
+    mysqli_stmt_bind_param($stmt, "i", $lowongan_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
     $job = mysqli_fetch_assoc($result);
-    mysqli_stmt_close($stmt); // Tutup statement setelah selesai
+    mysqli_stmt_close($stmt);
 } else {
     die("Error menyiapkan statement: " . mysqli_error($conn));
 }
 
-// Jika lowongan tidak ditemukan setelah query
 if (!$job) {
-    header("Location: index.php?error=notfound"); // Redirect ke index dengan pesan error
+    header("Location: index.php?error=" . urlencode("Lowongan tidak ditemukan."));
     exit();
 }
 ?>
@@ -66,6 +67,7 @@ if (!$job) {
   <link rel="icon" href="Image/logo-BM.png" type="image/x-icon">
 </head>
 <body>
+  <?= $feedback_message ?>
   <header class="navigasi">
     <div class="container">
       <div class="merek-navigasi">
@@ -91,6 +93,9 @@ if (!$job) {
       <div class="selamat-datang-user" style="display: none;">
         <span id="welcome-message"></span>
         <button class="tombol-logout" id="logout-button">Logout</button>
+        <?php if (isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'perusahaan') : ?>
+          <a href="tambah_lowongan.php"><button class="tombol-tambah-lowongan">Tambah Lowongan</button></a>
+        <?php endif; ?>
       </div>
     </div>
   </header>
@@ -148,7 +153,7 @@ if (!$job) {
               <h3>Deskripsi Pekerjaan</h3>
               <div class="deskripsi-pekerjaan">
                 <p><?= nl2br(htmlspecialchars($job['deskripsi'] ?? '')) ?></p>
-              </div>
+              </div
             </section>
             
             <section class="bagian-pekerjaan">
@@ -236,7 +241,7 @@ if (!$job) {
           
           <div class="aksi-pekerjaan">
             <a href="apply.php?id=<?= htmlspecialchars($job['id']) ?>" class="tombol-lamar tombol-penuh">Lamar Sekarang</a>
-            <button class="tombol-bagikan">Bagikan Lowongan</button>
+            <button class="tombol-simpan">Bagikan Lowongan</button>
           </div>
         </div>
       </div>
@@ -329,16 +334,19 @@ if (!$job) {
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Ambil data dari sesi PHP yang sudah ada di halaman (jika ada)
+      const isLoggedInPhp = <?= json_encode($_SESSION['is_logged_in'] ?? false) ?>;
+      const usernamePhp = <?= json_encode($_SESSION['username'] ?? '') ?>;
+      const userTypePhp = <?= json_encode($_SESSION['user_type'] ?? '') ?>;
+
       const authButtonsContainer = document.getElementById('auth-buttons');
       const welcomeUserContainer = document.querySelector('.selamat-datang-user');
       const welcomeMessageSpan = document.getElementById('welcome-message');
       const logoutButton = document.getElementById('logout-button');
+      const tambahLowonganButtonLink = document.getElementById('tambah-lowongan-btn');
 
       function checkLoginStatus() {
-        const isLoggedIn = localStorage.getItem('isLoggedIn');
-        const username = localStorage.getItem('username');
-
-        if (isLoggedIn === 'true' && username) {
+        if (isLoggedInPhp === true && usernamePhp !== '') {
           if (authButtonsContainer) {
             authButtonsContainer.style.display = 'none';
           }
@@ -346,7 +354,15 @@ if (!$job) {
             welcomeUserContainer.style.display = 'flex';
           }
           if (welcomeMessageSpan) {
-            welcomeMessageSpan.innerHTML = `👋 Selamat Datang Kembali, <b>${username}</b>!`;
+            welcomeMessageSpan.innerHTML = `👋 Selamat Datang Kembali, <b>${usernamePhp}</b>!`;
+          }
+          
+          if (tambahLowonganButtonLink) { // Pastikan tombol ada
+              if (userTypePhp === 'perusahaan') {
+                  tambahLowonganButtonLink.style.display = 'block'; 
+              } else {
+                  tambahLowonganButtonLink.style.display = 'none';
+              }
           }
         } else {
           if (authButtonsContainer) {
@@ -355,24 +371,20 @@ if (!$job) {
           if (welcomeUserContainer) {
             welcomeUserContainer.style.display = 'none';
           }
+           if (tambahLowonganButtonLink) { tambahLowonganButtonLink.style.display = 'none'; }
         }
       }
 
       function logout() {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('username');
-        localStorage.removeItem('userType');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('profileId');
-        window.location.href = 'login.php'; 
+        window.location.href = 'logout_process.php'; 
       }
 
       if (logoutButton) {
         logoutButton.addEventListener('click', logout);
       }
-      checkLoginStatus();
+      checkLoginStatus(); // Panggil saat DOM dimuat
 
-      // Modal logic for login form (still in JS for now)
+      // Modal logic for login form (tetap ada karena form login muncul di modal)
       const modal = document.getElementById('modalMasuk');
       const tombolMasuk = document.querySelector('.navigasi .tombol-masuk');
       const tutupModal = document.querySelector('.tutup-modal');

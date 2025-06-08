@@ -8,7 +8,7 @@ $username = $_SESSION['username'] ?? '';
 $userType = $_SESSION['user_type'] ?? '';
 $profileId = $_SESSION['profile_id'] ?? null;
 
-// Ambil data lowongan dari database
+// Query dasar untuk mengambil lowongan
 $query = "SELECT 
             l.lowongan_id AS id, 
             l.judul, 
@@ -17,17 +17,87 @@ $query = "SELECT
             l.gaji_max, 
             l.tanggal_deadline AS deadline,
             l.lokasi_kota AS lokasi,
+            l.lokasi_provinsi, -- Ambil juga provinsi untuk filter search
             p.nama_perusahaan AS perusahaan, 
             p.logo,
-            k.nama_kategori AS kategori
+            k.nama_kategori AS kategori,
+            l.tanggal_posting
           FROM lowongan l
           JOIN perusahaan p ON l.perusahaan_id = p.perusahaan_id
-          JOIN kategori k ON l.kategori_id = k.kategori_id
-          ORDER BY l.tanggal_posting DESC LIMIT 6";
+          JOIN kategori k ON l.kategori_id = k.kategori_id";
 
-$result = mysqli_query($conn, $query);
+$conditions = ["l.tanggal_deadline >= CURDATE()"]; // Kondisi default: lowongan yang masih aktif
+$params = [];
+$param_types = '';
 
-if (!$result) {
+// --- Logika Fungsi Pencarian (Search) ---
+if (!empty($_GET['kataKunci'])) {
+    $keyword = '%' . $_GET['kataKunci'] . '%';
+    $conditions[] = "(l.judul LIKE ? OR l.deskripsi LIKE ? OR l.kualifikasi LIKE ? OR p.nama_perusahaan LIKE ?)";
+    $params[] = $keyword;
+    $params[] = $keyword;
+    $params[] = $keyword;
+    $params[] = $keyword;
+    $param_types .= 'ssss';
+}
+
+if (!empty($_GET['kategori'])) {
+    $conditions[] = "l.kategori_id = ?";
+    $params[] = $_GET['kategori'];
+    $param_types .= 'i';
+}
+
+if (!empty($_GET['lokasi'])) {
+    $location_keyword = '%' . $_GET['lokasi'] . '%';
+    $conditions[] = "(l.lokasi_kota LIKE ? OR l.lokasi_provinsi LIKE ?)";
+    $params[] = $location_keyword;
+    $params[] = $location_keyword;
+    $param_types .= 'ss';
+}
+
+if (!empty($_GET['jenisPekerjaan'])) {
+    $conditions[] = "l.jenis_pekerjaan = ?";
+    $params[] = $_GET['jenisPekerjaan'];
+    $param_types .= 's';
+}
+
+if (!empty($_GET['gaji'])) {
+    $gaji_range = explode('-', $_GET['gaji']);
+    if (count($gaji_range) == 2) {
+        $min_gaji = (int)str_replace('Rp', '', trim($gaji_range[0]));
+        $max_gaji = (int)str_replace(['Rp', ' juta', '+'], '', trim($gaji_range[1]));
+        
+        if ($max_gaji == '20') { // Untuk "20 juta+"
+            $conditions[] = "l.gaji_min >= ?";
+            $params[] = $min_gaji;
+            $param_types .= 'i';
+        } else {
+            $conditions[] = "l.gaji_min >= ? AND l.gaji_max <= ?";
+            $params[] = $min_gaji;
+            $params[] = $max_gaji;
+            $param_types .= 'ii';
+        }
+    }
+}
+
+// Gabungkan semua kondisi WHERE
+if (!empty($conditions)) {
+    $query .= " WHERE " . implode(' AND ', $conditions);
+}
+
+$query .= " ORDER BY l.tanggal_posting DESC LIMIT 6"; // Urutkan dan batasi hasil
+
+// --- Eksekusi Query dengan Prepared Statement ---
+$stmt = mysqli_prepare($conn, $query);
+
+if ($stmt) {
+    if (!empty($params)) {
+        mysqli_stmt_bind_param($stmt, $param_types, ...$params);
+    }
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    mysqli_stmt_close($stmt);
+} else {
     die("Query lowongan gagal: " . mysqli_error($conn));
 }
 
@@ -73,9 +143,11 @@ if (isset($_GET['message'])) {
       <div class="selamat-datang-user" style="display: none;">
         <span id="welcome-message"></span>
         <button class="tombol-logout" id="logout-button">Logout</button>
-        <a href="tambah_lowongan.php" id="tambah-lowongan-btn" style="display: none;">
-          <button class="tombol-tambah-lowongan">Tambah Lowongan</button>
-        </a>
+        <?php if ($isLoggedIn && $userType === 'perusahaan') : ?>
+          <a href="tambah_lowongan.php" id="tambah-lowongan-btn">
+            <button class="tombol-tambah-lowongan">Tambah Lowongan</button>
+          </a>
+        <?php endif; ?>
       </div>
     </div>
   </header>
@@ -93,21 +165,24 @@ if (isset($_GET['message'])) {
             <h2>Cari Lowongan</h2>
           </div>
           <div class="badan-pencarian">
-            <form class="formulir-pencarian">
+            <form class="formulir-pencarian" method="GET" action="index.php">
               <div class="baris-pencarian">
                 <div class="kolom-pencarian">
                   <label for="kataKunci">Kata Kunci</label>
-                  <input type="text" id="kataKunci" name="kataKunci" placeholder="Posisi, jabatan, atau keahlian">
+                  <input type="text" id="kataKunci" name="kataKunci" placeholder="Posisi, jabatan, atau keahlian" value="<?= htmlspecialchars($_GET['kataKunci'] ?? '') ?>">
                 </div>
                 <div class="kolom-pencarian">
                   <label for="kategori">Kategori</label>
                   <select id="kategori" name="kategori">
                     <option value="">Semua Kategori</option>
-                    <option value="it">IT & Teknologi</option>
-                    <option value="keuangan">Keuangan</option>
-                    <option value="pendidikan">Pendidikan</option>
-                    <option value="kesehatan">Kesehatan</option>
-                    <option value="pemasaran">Pemasaran</option>
+                    <?php 
+                    $query_kategori_select = "SELECT kategori_id, nama_kategori FROM kategori ORDER BY nama_kategori ASC";
+                    $result_kategori_select = mysqli_query($conn, $query_kategori_select);
+                    while ($k = mysqli_fetch_assoc($result_kategori_select)) {
+                        $selected = (isset($_GET['kategori']) && $_GET['kategori'] == $k['kategori_id']) ? 'selected' : '';
+                        echo '<option value="' . htmlspecialchars($k['kategori_id']) . '" ' . $selected . '>' . htmlspecialchars($k['nama_kategori']) . '</option>';
+                    }
+                    ?>
                   </select>
                 </div>
               </div>
@@ -116,21 +191,24 @@ if (isset($_GET['message'])) {
                   <label for="lokasi">Lokasi</label>
                   <select id="lokasi" name="lokasi">
                     <option value="">Semua Lokasi</option>
-                    <option value="jakarta">Jakarta</option>
-                    <option value="bandung">Bandung</option>
-                    <option value="surabaya">Surabaya</option>
-                    <option value="yogyakarta">Yogyakarta</option>
-                    <option value="medan">Medan</option>
+                    <?php 
+                    $locations_query = "SELECT DISTINCT lokasi_kota FROM lowongan ORDER BY lokasi_kota ASC";
+                    $locations_result = mysqli_query($conn, $locations_query);
+                    while ($loc = mysqli_fetch_assoc($locations_result)) {
+                        $selected = (isset($_GET['lokasi']) && $_GET['lokasi'] == $loc['lokasi_kota']) ? 'selected' : '';
+                        echo '<option value="' . htmlspecialchars($loc['lokasi_kota']) . '" ' . $selected . '>' . htmlspecialchars($loc['lokasi_kota']) . '</option>';
+                    }
+                    ?>
                   </select>
                 </div>
                 <div class="kolom-pencarian">
                   <label for="jenisPekerjaan">Jenis Pekerjaan</label>
                   <select id="jenisPekerjaan" name="jenisPekerjaan">
                     <option value="">Semua Jenis</option>
-                    <option value="full-time">Full-time</option>
-                    <option value="part-time">Part-time</option>
-                    <option value="remote">Remote</option>
-                    <option value="freelance">Freelance</option>
+                    <option value="full-time" <?= (isset($_GET['jenisPekerjaan']) && $_GET['jenisPekerjaan'] == 'full-time') ? 'selected' : '' ?>>Full-time</option>
+                    <option value="part-time" <?= (isset($_GET['jenisPekerjaan']) && $_GET['jenisPekerjaan'] == 'part-time') ? 'selected' : '' ?>>Part-time</option>
+                    <option value="remote" <?= (isset($_GET['jenisPekerjaan']) && $_GET['jenisPekerjaan'] == 'remote') ? 'selected' : '' ?>>Remote</option>
+                    <option value="freelance" <?= (isset($_GET['jenisPekerjaan']) && $_GET['jenisPekerjaan'] == 'freelance') ? 'selected' : '' ?>>Freelance</option>
                   </select>
                 </div>
               </div>
@@ -139,11 +217,11 @@ if (isset($_GET['message'])) {
                   <label for="gaji">Rentang Gaji</label>
                   <select id="gaji" name="gaji">
                     <option value="">Semua Gaji</option>
-                    <option value="0-5">Rp0 - Rp5 juta</option>
-                    <option value="5-10">Rp5 - Rp10 juta</option>
-                    <option value="10-15">Rp10 - Rp15 juta</option>
-                    <option value="15-20">Rp15 - Rp20 juta</option>
-                    <option value="20+">Rp20 juta+</option>
+                    <option value="0-5" <?= (isset($_GET['gaji']) && $_GET['gaji'] == '0-5') ? 'selected' : '' ?>>Rp0 - Rp5 juta</option>
+                    <option value="5-10" <?= (isset($_GET['gaji']) && $_GET['gaji'] == '5-10') ? 'selected' : '' ?>>Rp5 - Rp10 juta</option>
+                    <option value="10-15" <?= (isset($_GET['gaji']) && $_GET['gaji'] == '10-15') ? 'selected' : '' ?>>Rp10 - Rp15 juta</option>
+                    <option value="15-20" <?= (isset($_GET['gaji']) && $_GET['gaji'] == '15-20') ? 'selected' : '' ?>>Rp15 - Rp20 juta</option>
+                    <option value="20+" <?= (isset($_GET['gaji']) && $_GET['gaji'] == '20+') ? 'selected' : '' ?>>Rp20 juta+</option>
                   </select>
                 </div>
                 <div class="kolom-pencarian kolom-pencarian-tombol">
@@ -308,7 +386,6 @@ if (isset($_GET['message'])) {
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       // Ambil data dari sesi PHP yang sudah ada di halaman (jika ada)
-      // Ini adalah cara untuk mengambil data dari PHP ke JavaScript
       const isLoggedInPhp = <?= json_encode($_SESSION['is_logged_in'] ?? false) ?>;
       const usernamePhp = <?= json_encode($_SESSION['username'] ?? '') ?>;
       const userTypePhp = <?= json_encode($_SESSION['user_type'] ?? '') ?>;
@@ -318,7 +395,6 @@ if (isset($_GET['message'])) {
       const welcomeMessageSpan = document.getElementById('welcome-message');
       const logoutButton = document.getElementById('logout-button');
       const tambahLowonganButtonLink = document.getElementById('tambah-lowongan-btn');
-
 
       function checkLoginStatus() {
         if (isLoggedInPhp === true && usernamePhp !== '') {
@@ -351,7 +427,6 @@ if (isset($_GET['message'])) {
       }
 
       function logout() {
-        // Panggil skrip PHP untuk menghancurkan sesi
         window.location.href = 'logout_process.php'; 
       }
 
@@ -360,13 +435,13 @@ if (isset($_GET['message'])) {
       }
       checkLoginStatus(); // Panggil saat DOM dimuat
 
-      // Modal logic for login form (tetap ada karena form login muncul di modal)
+      // Modal logic for login form
       const modal = document.getElementById('modalMasuk');
       const tombolMasuk = document.querySelector('.navigasi .tombol-masuk');
       const tutupModal = document.querySelector('.tutup-modal');
 
       tombolMasuk.addEventListener('click', function(e) {
-        e.preventDefault(); // Prevent default link behavior
+        e.preventDefault(); 
         modal.style.display = 'block';
       });
 
@@ -379,6 +454,7 @@ if (isset($_GET['message'])) {
           modal.style.display = 'none';
         }
       });
+      
     });
   </script>
 </body>
