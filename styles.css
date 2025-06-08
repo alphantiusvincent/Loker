@@ -598,10 +598,6 @@ button, input, select, textarea {
   padding: 1.5rem;
 }
 
-.bagian-pekerjaan {
-  margin-bottom: 2rem;
-}
-
 .bagian-pekerjaan:last-child {
   margin-bottom: 0;
 }
@@ -1112,4 +1108,22 @@ input[type="file"] {
 
 .tombol-logout:hover {
   background-color: #c0392b; /* Warna merah yang lebih gelap saat hover */
+}
+
+/* Gaya untuk tombol Dashboard */
+.tombol-dashboard {
+    padding: 0.5rem 1rem;
+    border-radius: var(--radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: var(--warna-info); /* Warna biru untuk dashboard */
+    border: 1px solid var(--warna-info);
+    color: white;
+    margin-left: 0.75rem;
+}
+
+.tombol-dashboard:hover {
+    background-color: #216be0; /* Warna biru lebih gelap saat hover */
+    border-color: #216be0;
 }

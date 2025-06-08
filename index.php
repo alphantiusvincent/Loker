@@ -4,9 +4,17 @@ session_start();
 
 // Inisialisasi variabel untuk status login dari sesi
 $isLoggedIn = $_SESSION['is_logged_in'] ?? false;
-$username = $_SESSION['username'] ?? '';
+$username = $_SESSION['username'] ?? ''; // Username dari tabel users
 $userType = $_SESSION['user_type'] ?? '';
 $profileId = $_SESSION['profile_id'] ?? null;
+
+$namaTampilanUser = $username; // Default: username dari tabel users
+if ($userType === 'pencari_kerja') {
+    $namaTampilanUser = $_SESSION['username'] ?? $username; // Ambil dari username atau nama_lengkap (jika ada di sesi)
+} elseif ($userType === 'perusahaan') {
+    $namaTampilanUser = $_SESSION['nama_perusahaan'] ?? $username; // Ambil nama perusahaan dari sesi
+}
+
 
 // Query dasar untuk mengambil lowongan
 $query = "SELECT 
@@ -17,7 +25,7 @@ $query = "SELECT
             l.gaji_max, 
             l.tanggal_deadline AS deadline,
             l.lokasi_kota AS lokasi,
-            l.lokasi_provinsi, -- Ambil juga provinsi untuk filter search
+            l.lokasi_provinsi,
             p.nama_perusahaan AS perusahaan, 
             p.logo,
             k.nama_kategori AS kategori,
@@ -26,7 +34,7 @@ $query = "SELECT
           JOIN perusahaan p ON l.perusahaan_id = p.perusahaan_id
           JOIN kategori k ON l.kategori_id = k.kategori_id";
 
-$conditions = ["l.tanggal_deadline >= CURDATE()"]; // Kondisi default: lowongan yang masih aktif
+$conditions = ["l.status = 'aktif'", "l.tanggal_deadline >= CURDATE()"]; // Kondisi default
 $params = [];
 $param_types = '';
 
@@ -62,16 +70,21 @@ if (!empty($_GET['jenisPekerjaan'])) {
 }
 
 if (!empty($_GET['gaji'])) {
-    $gaji_range = explode('-', $_GET['gaji']);
-    if (count($gaji_range) == 2) {
-        $min_gaji = (int)str_replace('Rp', '', trim($gaji_range[0]));
-        $max_gaji = (int)str_replace(['Rp', ' juta', '+'], '', trim($gaji_range[1]));
-        
-        if ($max_gaji == '20') { // Untuk "20 juta+"
-            $conditions[] = "l.gaji_min >= ?";
-            $params[] = $min_gaji;
-            $param_types .= 'i';
-        } else {
+    $gaji_range_val = $_GET['gaji'];
+    
+    if ($gaji_range_val === '20+') {
+        $conditions[] = "l.gaji_min >= ?";
+        $params[] = 20000000;
+        $param_types .= 'i';
+    } else {
+        $gaji_parts = explode('-', $gaji_range_val);
+        if (count($gaji_parts) == 2) {
+            $min_gaji_str = $gaji_parts[0];
+            $max_gaji_str = $gaji_parts[1];
+            
+            $min_gaji = (int)$min_gaji_str * 1000000; // Mengubah '0-5' menjadi 0jt-5jt
+            $max_gaji = (int)$max_gaji_str * 1000000;
+            
             $conditions[] = "l.gaji_min >= ? AND l.gaji_max <= ?";
             $params[] = $min_gaji;
             $params[] = $max_gaji;
@@ -92,7 +105,8 @@ $stmt = mysqli_prepare($conn, $query);
 
 if ($stmt) {
     if (!empty($params)) {
-        mysqli_stmt_bind_param($stmt, $param_types, ...$params);
+        // ...$params digunakan untuk "unpack" array $params ke argumen terpisah
+        mysqli_stmt_bind_param($stmt, $param_types, ...$params); 
     }
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
@@ -136,16 +150,19 @@ if (isset($_GET['message'])) {
           <li><a href="#">Tentang Kami</a></li>
         </ul>
       </nav>
-      <div class="otentikasi-navigasi" id="auth-buttons">
+      <div class="otentikasi-navigasi" <?= ($isLoggedIn) ? 'style="display: none;"' : '' ?>>
         <a href="login.php"><button class="tombol-masuk">Masuk</button></a>
         <a href="register.php"><button class="tombol-daftar">Daftar</button></a>
       </div>
-      <div class="selamat-datang-user" style="display: none;">
-        <span id="welcome-message"></span>
+      <div class="selamat-datang-user" <?= ($isLoggedIn) ? 'style="display: flex;"' : 'style="display: none;"' ?>>
+        <span id="welcome-message">👋 Selamat Datang Kembali, <b><?= htmlspecialchars($namaTampilanUser) ?></b>!</span>
         <button class="tombol-logout" id="logout-button">Logout</button>
         <?php if ($isLoggedIn && $userType === 'perusahaan') : ?>
-          <a href="tambah_lowongan.php" id="tambah-lowongan-btn">
+          <a href="tambah_lowongan.php">
             <button class="tombol-tambah-lowongan">Tambah Lowongan</button>
+          </a>
+          <a href="dashboard_perusahaan.php">
+            <button class="tombol-dashboard">Dashboard</button>
           </a>
         <?php endif; ?>
       </div>
@@ -385,76 +402,13 @@ if (isset($_GET['message'])) {
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      // Ambil data dari sesi PHP yang sudah ada di halaman (jika ada)
-      const isLoggedInPhp = <?= json_encode($_SESSION['is_logged_in'] ?? false) ?>;
-      const usernamePhp = <?= json_encode($_SESSION['username'] ?? '') ?>;
-      const userTypePhp = <?= json_encode($_SESSION['user_type'] ?? '') ?>;
-
-      const authButtonsContainer = document.getElementById('auth-buttons');
-      const welcomeUserContainer = document.querySelector('.selamat-datang-user');
-      const welcomeMessageSpan = document.getElementById('welcome-message');
+      // Logic untuk logout
       const logoutButton = document.getElementById('logout-button');
-      const tambahLowonganButtonLink = document.getElementById('tambah-lowongan-btn');
-
-      function checkLoginStatus() {
-        if (isLoggedInPhp === true && usernamePhp !== '') {
-          if (authButtonsContainer) {
-            authButtonsContainer.style.display = 'none';
-          }
-          if (welcomeUserContainer) {
-            welcomeUserContainer.style.display = 'flex';
-          }
-          if (welcomeMessageSpan) {
-            welcomeMessageSpan.innerHTML = `👋 Selamat Datang Kembali, <b>${usernamePhp}</b>!`;
-          }
-          
-          if (tambahLowonganButtonLink) { // Pastikan tombol ada
-              if (userTypePhp === 'perusahaan') {
-                  tambahLowonganButtonLink.style.display = 'block'; 
-              } else {
-                  tambahLowonganButtonLink.style.display = 'none';
-              }
-          }
-        } else {
-          if (authButtonsContainer) {
-            authButtonsContainer.style.display = 'flex'; 
-          }
-          if (welcomeUserContainer) {
-            welcomeUserContainer.style.display = 'none';
-          }
-           if (tambahLowonganButtonLink) { tambahLowonganButtonLink.style.display = 'none'; }
-        }
-      }
-
-      function logout() {
-        window.location.href = 'logout_process.php'; 
-      }
-
       if (logoutButton) {
-        logoutButton.addEventListener('click', logout);
+        logoutButton.addEventListener('click', function() {
+          window.location.href = 'logout_process.php'; 
+        });
       }
-      checkLoginStatus(); // Panggil saat DOM dimuat
-
-      // Modal logic for login form
-      const modal = document.getElementById('modalMasuk');
-      const tombolMasuk = document.querySelector('.navigasi .tombol-masuk');
-      const tutupModal = document.querySelector('.tutup-modal');
-
-      tombolMasuk.addEventListener('click', function(e) {
-        e.preventDefault(); 
-        modal.style.display = 'block';
-      });
-
-      tutupModal.addEventListener('click', function() {
-        modal.style.display = 'none';
-      });
-
-      window.addEventListener('click', function(event) {
-        if (event.target == modal) {
-          modal.style.display = 'none';
-        }
-      });
-      
     });
   </script>
 </body>

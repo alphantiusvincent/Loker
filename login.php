@@ -11,7 +11,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($username) || empty($password)) {
         $message = "error|Username dan password harus diisi.";
     } else {
-        $query = "SELECT user_id, username, password, user_type FROM users WHERE username = ?";
+        $query = "SELECT user_id, username, password, user_type, email FROM users WHERE username = ?";
         $stmt = mysqli_prepare($conn, $query);
 
         if ($stmt) {
@@ -21,20 +21,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $user = mysqli_fetch_assoc($result);
             mysqli_stmt_close($stmt);
 
-            if ($user && $password === $user['password']) {
+            if ($user && $password === $user['password']) { // PENTING: Bandingkan plain text password (untuk demo)
                 $_SESSION['is_logged_in'] = true;
                 $_SESSION['user_id'] = $user['user_id'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['user_type'] = $user['user_type'];
+                $_SESSION['email'] = $user['email']; // Simpan email ke sesi
 
                 $profile_id = null;
                 if ($user['user_type'] === 'pencari_kerja') {
-                    $query_profile = "SELECT pencari_id FROM pencari_kerja WHERE user_id = ?";
-                } elseif ($user['user_type'] === 'perusahaan') {
-                    $query_profile = "SELECT perusahaan_id FROM perusahaan WHERE user_id = ?";
-                }
-
-                if (isset($query_profile)) {
+                    $query_profile = "SELECT pencari_id, nama_lengkap FROM pencari_kerja WHERE user_id = ?";
                     $stmt_profile = mysqli_prepare($conn, $query_profile);
                     if ($stmt_profile) {
                         mysqli_stmt_bind_param($stmt_profile, "i", $user['user_id']);
@@ -44,19 +40,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         mysqli_stmt_close($stmt_profile);
                         
                         if ($profile_data) {
-                            $profile_id = ($user['user_type'] === 'pencari_kerja') ? $profile_data['pencari_id'] : $profile_data['perusahaan_id'];
-                            $_SESSION['profile_id'] = $profile_id;
+                            $profile_id = $profile_data['pencari_id'];
+                            $_SESSION['profile_id'] = $profile_id; // Simpan profile_id ke sesi
+                            $_SESSION['nama_lengkap'] = $profile_data['nama_lengkap']; // Simpan nama lengkap ke sesi
                         } else {
-                            $message = "error|Profil pengguna tidak ditemukan. Silakan hubungi admin.";
+                            $message = "error|Profil pencari kerja tidak ditemukan untuk user ini. Silakan daftar ulang atau hubungi admin.";
                         }
                     } else {
-                        $message = "error|Gagal menyiapkan statement profil.";
+                        $message = "error|Gagal menyiapkan statement profil pencari kerja.";
+                    }
+                } elseif ($user['user_type'] === 'perusahaan') {
+                    $query_profile = "SELECT perusahaan_id, nama_perusahaan FROM perusahaan WHERE user_id = ?";
+                    $stmt_profile = mysqli_prepare($conn, $query_profile);
+                    if ($stmt_profile) {
+                        mysqli_stmt_bind_param($stmt_profile, "i", $user['user_id']);
+                        mysqli_stmt_execute($stmt_profile);
+                        $result_profile = mysqli_stmt_get_result($stmt_profile);
+                        $profile_data = mysqli_fetch_assoc($result_profile);
+                        mysqli_stmt_close($stmt_profile);
+
+                        if ($profile_data) {
+                            $profile_id = $profile_data['perusahaan_id'];
+                            $_SESSION['profile_id'] = $profile_id; // Simpan profile_id ke sesi
+                            $_SESSION['nama_perusahaan'] = $profile_data['nama_perusahaan']; // Simpan nama perusahaan ke sesi
+                        } else {
+                            $message = "error|Profil perusahaan tidak ditemukan untuk user ini. Silakan daftar ulang atau hubungi admin.";
+                        }
+                    } else {
+                        $message = "error|Gagal menyiapkan statement profil perusahaan.";
                     }
                 }
 
-                if (empty($message)) { // Hanya redirect jika tidak ada error profil
+                if (!empty($message)) { // Jika ada error profil, jangan redirect
+                     // Tampilkan error message, lalu biarkan form login tetap tampil
+                } else {
                     $message = "success|Login berhasil! Selamat datang, " . htmlspecialchars($user['username']) . "!";
-                    header("Location: index.php?message=" . urlencode($message));
+                    // === PERUBAHAN REDIRECT DI SINI ===
+                    if ($user['user_type'] === 'perusahaan') {
+                        header("Location: dashboard_perusahaan.php?message=" . urlencode("Login berhasil! Selamat datang, " . htmlspecialchars($_SESSION['nama_perusahaan']) . "!")); // Redirect ke dashboard perusahaan
+                    } else {
+                        header("Location: index.php?message=" . urlencode("Login berhasil! Selamat datang, " . htmlspecialchars($_SESSION['username']) . "!")); // Redirect ke halaman utama
+                    }
                     exit();
                 }
 
@@ -70,18 +94,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Pesan feedback (sukses/gagal) untuk alert JavaScript
-// Ambil pesan dari URL (jika ada) atau dari proses POST
 $feedback_text_for_alert = '';
 if (isset($_GET['message'])) {
     $feedback_text_for_alert = $_GET['message'];
 } elseif (isset($message)) {
-    // Jika $message dari POST request, formatnya "type|text"
     $parts = explode('|', $message, 2);
-    $feedback_text_for_alert = $parts[1] ?? $parts[0]; // Ambil bagian teks, atau seluruhnya jika tidak ada '|'
+    $feedback_text_for_alert = $parts[1] ?? $parts[0];
 }
 
-// Tampilkan alert jika ada pesan
 $feedback_script = '';
 if (!empty($feedback_text_for_alert)) {
     $feedback_script = "<script>alert('" . htmlspecialchars($feedback_text_for_alert) . "');</script>";
@@ -97,7 +117,8 @@ if (!empty($feedback_text_for_alert)) {
     <link rel="stylesheet" href="login.css">
 </head>
 <body>
-<?= $feedback_script ?> <div class="login-container">
+<?= $feedback_script ?>
+<div class="login-container">
     <h2>Login</h2>
     <label for="userType">Login sebagai:</label>
     <select id="userType">
@@ -106,7 +127,8 @@ if (!empty($feedback_text_for_alert)) {
     </select>
     
     <div id="jobSeekerForm">
-        <form id="loginForm" action="login.php" method="POST"> <div class="form-group">
+        <form id="loginForm" action="login.php" method="POST">
+            <div class="form-group">
                 <label for="js-username">Username</label>
                 <input type="text" id="js-username" name="username" required>
             </div>
@@ -125,7 +147,33 @@ if (!empty($feedback_text_for_alert)) {
 </div>
 
 <script>
-    // ... (Sisa JavaScript tetap sama, karena sekarang form di-submit via PHP POST) ...
+    document.addEventListener('DOMContentLoaded', function() {
+        const userTypeSelect = document.getElementById('userType');
+        const loginForm = document.getElementById('loginForm');
+        
+        // Hapus event listener submit lama jika ada (pastikan hanya ada satu submit handler)
+        if (loginForm) {
+            // Jika ada event listener JS sebelumnya yang terdaftar, hapus di sini
+            // Namun, karena sekarang form di-submit via PHP POST, event listener JS sebelumnya tidak relevan
+            // dan tidak perlu dihapus secara eksplisit kecuali Anda punya JS lain di sini.
+        }
+
+        userTypeSelect.addEventListener('change', function() {
+            // Logika untuk menampilkan/menyembunyikan form tertentu jika ada
+            // (saat ini tidak ada form terpisah di HTML, hanya select)
+            console.log('Selected user type:', this.value);
+        });
+
+        // Kosongkan localStorage saat halaman login dimuat,
+        // karena sekarang kita mengandalkan sesi PHP.
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('username');
+        localStorage.removeItem('userType');
+        localStorage.removeItem('userId');
+        localStorage.removeItem('profileId');
+        localStorage.removeItem('nama_lengkap'); // Hapus juga ini
+        localStorage.removeItem('nama_perusahaan'); // Hapus juga ini
+    });
 </script>
 
 </body>
