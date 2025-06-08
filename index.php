@@ -1,10 +1,14 @@
 <?php
-// Pastikan koneksi.php ada di direktori yang sama
-require_once "koneksi.php"; // Menggunakan require_once untuk menghindari masalah jika dipanggil berkali-kali
-session_start(); // Pastikan session_start() dipanggil paling awal jika ada output lain
+require_once "koneksi.php";
+session_start();
+
+// Inisialisasi variabel untuk status login dari sesi
+$isLoggedIn = $_SESSION['is_logged_in'] ?? false;
+$username = $_SESSION['username'] ?? '';
+$userType = $_SESSION['user_type'] ?? '';
+$profileId = $_SESSION['profile_id'] ?? null;
 
 // Ambil data lowongan dari database
-// Sesuaikan query dengan skema bawamap.sql yang Anda miliki
 $query = "SELECT 
             l.lowongan_id AS id, 
             l.judul, 
@@ -19,13 +23,18 @@ $query = "SELECT
           FROM lowongan l
           JOIN perusahaan p ON l.perusahaan_id = p.perusahaan_id
           JOIN kategori k ON l.kategori_id = k.kategori_id
-          ORDER BY l.tanggal_posting DESC LIMIT 6"; // Mengambil 6 lowongan terbaru
+          ORDER BY l.tanggal_posting DESC LIMIT 6";
 
 $result = mysqli_query($conn, $query);
 
-// Periksa apakah query berhasil
 if (!$result) {
     die("Query lowongan gagal: " . mysqli_error($conn));
+}
+
+// Pesan feedback dari redirect (misal dari apply.php atau register.php)
+$feedback_message = '';
+if (isset($_GET['message'])) {
+    $feedback_message = "<script>alert('" . htmlspecialchars($_GET['message']) . "');</script>";
 }
 ?>
 <!DOCTYPE html>
@@ -38,6 +47,7 @@ if (!$result) {
   <link rel="icon" href="Image/logo-BM.png" type="image/x-icon">
 </head>
 <body>
+  <?= $feedback_message ?>
   <header class="navigasi">
     <div class="container">
       <div class="merek-navigasi">
@@ -63,6 +73,9 @@ if (!$result) {
       <div class="selamat-datang-user" style="display: none;">
         <span id="welcome-message"></span>
         <button class="tombol-logout" id="logout-button">Logout</button>
+        <a href="tambah_lowongan.php" id="tambah-lowongan-btn" style="display: none;">
+          <button class="tombol-tambah-lowongan">Tambah Lowongan</button>
+        </a>
       </div>
     </div>
   </header>
@@ -165,7 +178,7 @@ if (!$result) {
                     <span class="kategori-pekerjaan <?= $kategoriClass ?>"> <?= htmlspecialchars($row['kategori'] ?? 'Umum') ?> </span>
                     <?php 
                     $jenisClass = strtolower($row['jenis'] ?? '');
-                    if (empty($jenisClass)) $jenisClass = 'full-time'; // Default jika jenis kosong
+                    if (empty($jenisClass)) $jenisClass = 'full-time';
                     $jenisClass = 'jenis-pekerjaan-' . $jenisClass;
                     ?>
                     <span class="jenis-pekerjaan <?= $jenisClass ?>"> <?= htmlspecialchars($row['jenis'] ?? 'Full-time') ?> </span>
@@ -192,7 +205,7 @@ if (!$result) {
                     }
                     ?>
                     <div class="gaji-pekerjaan"><?= htmlspecialchars($gajiText) ?></div>
-                    <div class="deadline-pekerjaan">Deadline: <?= date("d M Y", strtotime($row['deadline'] ?? '')) ?></div>
+                    <div class="deadline-pekerjaan">Deadline: <?= date("d M Y", strtotime($row['deadline'])) ?></div>
                   </div>
                 </div>
               </div>
@@ -294,18 +307,21 @@ if (!$result) {
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Ambil data dari sesi PHP yang sudah ada di halaman (jika ada)
+      // Ini adalah cara untuk mengambil data dari PHP ke JavaScript
+      const isLoggedInPhp = <?= json_encode($_SESSION['is_logged_in'] ?? false) ?>;
+      const usernamePhp = <?= json_encode($_SESSION['username'] ?? '') ?>;
+      const userTypePhp = <?= json_encode($_SESSION['user_type'] ?? '') ?>;
+
       const authButtonsContainer = document.getElementById('auth-buttons');
       const welcomeUserContainer = document.querySelector('.selamat-datang-user');
       const welcomeMessageSpan = document.getElementById('welcome-message');
       const logoutButton = document.getElementById('logout-button');
-      // jobListingsContainer dihapus karena data lowongan sekarang dimuat oleh PHP
+      const tambahLowonganButtonLink = document.getElementById('tambah-lowongan-btn');
 
-      // Function to check login status (simulated)
+
       function checkLoginStatus() {
-        const isLoggedIn = localStorage.getItem('isLoggedIn');
-        const username = localStorage.getItem('username');
-
-        if (isLoggedIn === 'true' && username) {
+        if (isLoggedInPhp === true && usernamePhp !== '') {
           if (authButtonsContainer) {
             authButtonsContainer.style.display = 'none';
           }
@@ -313,7 +329,15 @@ if (!$result) {
             welcomeUserContainer.style.display = 'flex';
           }
           if (welcomeMessageSpan) {
-            welcomeMessageSpan.innerHTML = `👋 Selamat Datang Kembali, <b>${username}</b>!`;
+            welcomeMessageSpan.innerHTML = `👋 Selamat Datang Kembali, <b>${usernamePhp}</b>!`;
+          }
+          
+          if (tambahLowonganButtonLink) { // Pastikan tombol ada
+              if (userTypePhp === 'perusahaan') {
+                  tambahLowonganButtonLink.style.display = 'block'; 
+              } else {
+                  tambahLowonganButtonLink.style.display = 'none';
+              }
           }
         } else {
           if (authButtonsContainer) {
@@ -322,30 +346,39 @@ if (!$result) {
           if (welcomeUserContainer) {
             welcomeUserContainer.style.display = 'none';
           }
+           if (tambahLowonganButtonLink) { tambahLowonganButtonLink.style.display = 'none'; }
         }
       }
 
-      // Function to handle logout
       function logout() {
-        localStorage.removeItem('isLoggedIn');
-        localStorage.removeItem('username');
-        localStorage.removeItem('userType');
-        localStorage.removeItem('userId');
-        localStorage.removeItem('profileId');
-        window.location.href = 'login.php'; // Perbarui link ke login.php
+        // Panggil skrip PHP untuk menghancurkan sesi
+        window.location.href = 'logout_process.php'; 
       }
 
-      // Add event listener to logout button
       if (logoutButton) {
         logoutButton.addEventListener('click', logout);
       }
+      checkLoginStatus(); // Panggil saat DOM dimuat
 
-      // Initial call for login status
-      checkLoginStatus();
+      // Modal logic for login form (tetap ada karena form login muncul di modal)
+      const modal = document.getElementById('modalMasuk');
+      const tombolMasuk = document.querySelector('.navigasi .tombol-masuk');
+      const tutupModal = document.querySelector('.tutup-modal');
 
-      // loadJobs() function (yang memanggil backend Node.js) dihapus dari sini,
-      // karena data lowongan sekarang dimuat langsung oleh PHP di server side.
-      // Filter pencarian dan tombol "Muat Lebih Banyak" akan memerlukan implementasi PHP/AJAX jika ingin berfungsi.
+      tombolMasuk.addEventListener('click', function(e) {
+        e.preventDefault(); // Prevent default link behavior
+        modal.style.display = 'block';
+      });
+
+      tutupModal.addEventListener('click', function() {
+        modal.style.display = 'none';
+      });
+
+      window.addEventListener('click', function(event) {
+        if (event.target == modal) {
+          modal.style.display = 'none';
+        }
+      });
     });
   </script>
 </body>

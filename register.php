@@ -2,11 +2,11 @@
 require_once "koneksi.php";
 session_start();
 
-$message = ''; // Untuk pesan sukses/gagal registrasi
+$message = ''; // Untuk menyimpan pesan feedback
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $current_form_type = $_POST['currentFormType'] ?? 'pencari-kerja'; // Hidden input dari JS
-    
+    $current_form_type = $_POST['currentFormType'] ?? ''; // Ambil jenis form dari hidden input
+
     if ($current_form_type === 'pencari-kerja') {
         $nama_lengkap = $_POST['namaLengkap'] ?? '';
         $email = $_POST['email'] ?? '';
@@ -20,10 +20,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Untuk demo, kita simpan plain text.
             // $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            // Periksa apakah email atau username sudah ada
+            $username = explode('@', $email)[0]; // Ambil username dari email
+
+            // Periksa apakah email atau username sudah ada di tabel users
             $check_user_query = "SELECT COUNT(*) FROM users WHERE email = ? OR username = ?";
             $stmt_check = mysqli_prepare($conn, $check_user_query);
-            $username = explode('@', $email)[0];
             mysqli_stmt_bind_param($stmt_check, "ss", $email, $username);
             mysqli_stmt_execute($stmt_check);
             mysqli_stmt_bind_result($stmt_check, $count);
@@ -33,8 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($count > 0) {
                 $message = "error|Email atau username sudah terdaftar.";
             } else {
-                // Mulai transaksi
-                mysqli_begin_transaction($conn);
+                mysqli_begin_transaction($conn); // Mulai transaksi
                 try {
                     // Masukkan ke tabel users
                     $insert_user_query = "INSERT INTO users (username, email, password, user_type) VALUES (?, ?, ?, 'pencari_kerja')";
@@ -51,12 +51,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     mysqli_stmt_execute($stmt_pencari);
                     mysqli_stmt_close($stmt_pencari);
 
-                    mysqli_commit($conn);
+                    mysqli_commit($conn); // Commit transaksi
                     $message = "success|Registrasi pencari kerja berhasil! Silakan login.";
                     header("Location: login.php?message=" . urlencode($message));
                     exit();
                 } catch (Exception $e) {
-                    mysqli_rollback($conn);
+                    mysqli_rollback($conn); // Rollback jika ada error
                     $message = "error|Terjadi kesalahan saat registrasi: " . $e->getMessage();
                     error_log("Registrasi Pencari Kerja Error: " . $e->getMessage());
                 }
@@ -76,10 +76,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // PENTING: Dalam aplikasi nyata, password HARUS di-hash!
             // $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            // Periksa apakah email atau username sudah ada
+            $username = explode('@', $email_perusahaan)[0]; // Ambil username dari email perusahaan
+
+            // Periksa apakah email atau username sudah ada di tabel users
             $check_user_query = "SELECT COUNT(*) FROM users WHERE email = ? OR username = ?";
             $stmt_check = mysqli_prepare($conn, $check_user_query);
-            $username = explode('@', $email_perusahaan)[0];
             mysqli_stmt_bind_param($stmt_check, "ss", $email_perusahaan, $username);
             mysqli_stmt_execute($stmt_check);
             mysqli_stmt_bind_result($stmt_check, $count);
@@ -89,8 +90,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($count > 0) {
                 $message = "error|Email atau username sudah terdaftar.";
             } else {
-                // Mulai transaksi
-                mysqli_begin_transaction($conn);
+                mysqli_begin_transaction($conn); // Mulai transaksi
                 try {
                     // Masukkan ke tabel users
                     $insert_user_query = "INSERT INTO users (username, email, password, user_type) VALUES (?, ?, ?, 'perusahaan')";
@@ -107,12 +107,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     mysqli_stmt_execute($stmt_perusahaan);
                     mysqli_stmt_close($stmt_perusahaan);
 
-                    mysqli_commit($conn);
+                    mysqli_commit($conn); // Commit transaksi
                     $message = "success|Registrasi perusahaan berhasil! Silakan login.";
                     header("Location: login.php?message=" . urlencode($message));
                     exit();
                 } catch (Exception $e) {
-                    mysqli_rollback($conn);
+                    mysqli_rollback($conn); // Rollback jika ada error
                     $message = "error|Terjadi kesalahan saat registrasi: " . $e->getMessage();
                     error_log("Registrasi Perusahaan Error: " . $e->getMessage());
                 }
@@ -121,11 +121,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Pesan feedback (sukses/gagal)
-$feedback_message = '';
+// Pesan feedback (sukses/gagal) untuk alert JavaScript
+$feedback_text_for_alert = '';
 if (!empty($message)) {
     list($type, $text) = explode('|', $message, 2);
-    $feedback_message = "<script>alert('" . htmlspecialchars($text) . "');</script>";
+    $feedback_text_for_alert = $text;
 }
 ?>
 <!DOCTYPE html>
@@ -138,7 +138,12 @@ if (!empty($message)) {
   <link rel="icon" href="Image/logo-BM.png" type="image/x-icon">
 </head>
 <body>
-  <?= $feedback_message ?>
+  <?php if (!empty($feedback_text_for_alert)) : ?>
+    <script>
+      alert('<?= htmlspecialchars($feedback_text_for_alert) ?>');
+    </script>
+  <?php endif; ?>
+
   <header class="navigasi">
     <div class="container">
       <div class="merek-navigasi">
@@ -309,9 +314,6 @@ if (!empty($message)) {
       const logoutButton = document.getElementById('logout-button');
 
       function checkLoginStatus() {
-        // Pada halaman PHP, status login sebenarnya dikelola oleh sesi PHP.
-        // JavaScript di sini hanya untuk tampilan awal.
-        // Untuk demo ini, kita masih mengambil dari localStorage untuk tampilan.
         const isLoggedIn = localStorage.getItem('isLoggedIn');
         const username = localStorage.getItem('username');
 
@@ -336,7 +338,6 @@ if (!empty($message)) {
       }
 
       function logout() {
-        // Saat tombol logout ditekan, kita akan memanggil skrip PHP untuk menghancurkan sesi.
         window.location.href = 'logout_process.php'; // Redirect ke logout_process.php
       }
 
@@ -351,7 +352,7 @@ if (!empty($message)) {
       const registerForm = document.getElementById('registerForm');
       const currentFormTypeHidden = document.getElementById('currentFormType'); // Hidden input untuk jenis form
 
-      let currentFormType = 'pencari-kerja'; // Default form
+      let currentFormType = 'pencari-kerja'; // Default form saat ini, akan diupdate dari hidden input
 
       opsiMasukItems.forEach(item => {
         item.addEventListener('click', function() {
@@ -364,26 +365,24 @@ if (!empty($message)) {
           if (currentFormType === 'pencari-kerja') {
             formPencariKerja.style.display = 'block';
             formPerusahaan.style.display = 'none';
-            // Set required attributes for job seeker form
             formPencariKerja.querySelectorAll('input').forEach(input => input.setAttribute('required', ''));
             formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('required'));
           } else {
             formPencariKerja.style.display = 'none';
             formPerusahaan.style.display = 'block';
-            // Set required attributes for company form
             formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.setAttribute('required', ''));
             formPencariKerja.querySelectorAll('input').forEach(input => input.removeAttribute('required'));
           }
         });
       });
 
-      // Initialize form display based on active tab
-      if (currentFormTypeHidden.value === 'pencari-kerja') { // Gunakan nilai dari hidden input untuk init
+      // Initialize form display based on value in hidden input (if page was redirected with POST)
+      if (currentFormTypeHidden.value === 'pencari-kerja') {
         formPencariKerja.style.display = 'block';
         formPerusahaan.style.display = 'none';
         formPencariKerja.querySelectorAll('input').forEach(input => input.setAttribute('required', ''));
         formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.removeAttribute('required'));
-      } else {
+      } else { // currentFormTypeHidden.value is 'perusahaan'
          formPencariKerja.style.display = 'none';
          formPerusahaan.style.display = 'block';
          formPerusahaan.querySelectorAll('input, textarea').forEach(input => input.setAttribute('required', ''));
